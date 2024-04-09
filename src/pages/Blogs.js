@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Button, IconButton, Avatar, TextField, Paper, Typography, Divider, LinearProgress } from '@mui/material'; // Import LinearProgress for loading bar
 import { auth } from '../firebaseConfig';
 import { getDatabase, ref, onValue, push } from 'firebase/database';
+
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 import DeleteButton from './DeleteButton';
 import Comments from './Comments';
 
@@ -46,13 +48,9 @@ const Blogs = () => {
     const storage = getStorage();
     const imageRef = storageRef(storage, `images/${imageFile.name}`);
     const uploadTask = uploadBytes(imageRef, imageFile);
-
-    // Track upload progress
-    uploadTask.on('state_changed', (snapshot) => {
-      const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-      setUploadProgress(progress);
-    });
-
+  
+    
+  
     try {
       await uploadTask;
       const imageUrl = await getDownloadURL(imageRef);
@@ -63,7 +61,7 @@ const Blogs = () => {
       // Handle error
     }
   };
-
+  
   const handlePost = async () => {
     if (!postTitle.trim() || !commentText.trim() || !imageFile) return;
 
