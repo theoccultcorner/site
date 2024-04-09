@@ -64,7 +64,7 @@ const Layout = () => {
       <AppBar position="static" style={{ background: 'black' }}>
         <Toolbar>
           <Typography variant="h6" component={Link} to="/" style={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
-            TheGnosticChristian
+            TheGnosticChristian.Org
           </Typography>
           {user ? (
             <div>
