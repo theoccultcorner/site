@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TextField, Button, Typography, Container, Grid, Link } from '@mui/material';
 import './Contact.css'; // Import external CSS file for additional styling
 
 const Contact = () => {
@@ -43,44 +44,58 @@ const Contact = () => {
   };
 
   return (
-    <div className="contact-container">
-      <h1>Contact Me</h1>
-      <div className="social-media">
-        <a href="https://twitter.com/example" target="_blank" rel="noopener noreferrer">Twitter</a>
-        <a href="https://facebook.com/example" target="_blank" rel="noopener noreferrer">Facebook</a>
-        <a href="https://instagram.com/example" target="_blank" rel="noopener noreferrer">Instagram</a>
+    <Container maxWidth="sm">
+      <div className="contact-container">
+        <Typography variant="h4" gutterBottom>
+          Send us a message.
+        </Typography>
+        <div className="social-media">
+          <Link href="https://twitter.com/example" target="_blank" rel="noopener noreferrer">Twitter</Link>
+          <Link href="https://facebook.com/example" target="_blank" rel="noopener noreferrer">Facebook</Link>
+          <Link href="https://instagram.com/example" target="_blank" rel="noopener noreferrer">Instagram</Link>
+        </div>
+        <form onSubmit={handleSubmit} className="contact-form">
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Name"
+                variant="outlined"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email"
+                variant="outlined"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Message"
+                variant="outlined"
+                multiline
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                required
+              />
+            </Grid>
+          </Grid>
+          <Button type="submit" variant="contained" color="primary" style={{ marginTop: '1rem' }}>
+            Submit
+          </Button>
+        </form>
       </div>
-      <form onSubmit={handleSubmit} className="contact-form">
-        <label htmlFor="name">Name:</label>
-        <input
-          id="name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="input-field"
-        />
-        <label htmlFor="email">Email:</label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="input-field"
-        />
-        <label htmlFor="message">Message:</label>
-        <textarea
-          id="message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          required
-          rows={4}
-          className="input-field"
-        />
-        <button type="submit" className="submit-button">Submit</button>
-      </form>
-    </div>
+    </Container>
   );
 };
 
