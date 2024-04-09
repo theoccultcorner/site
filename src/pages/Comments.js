@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, IconButton, Avatar, Typography, TextField, Button } from '@mui/material';
-import { getDatabase, ref, push, onValue, remove } from 'firebase/database';
+import { Grid, IconButton, Avatar, Typography } from '@mui/material';
+import { getDatabase, ref, onValue, remove } from 'firebase/database';
 
 const Comments = ({ postId, user }) => {
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
     const db = getDatabase();
@@ -25,25 +24,6 @@ const Comments = ({ postId, user }) => {
     });
   }, [postId]);
 
-  const handleComment = async () => {
-    if (!newComment.trim() || !user) return;
-
-    const db = getDatabase();
-    const commentsRef = ref(db, `blogPosts/${postId}/comments`);
-    const newCommentRef = push(commentsRef);
-
-    // Add new comment to the database
-    await newCommentRef.set({
-      text: newComment.trim(),
-      userId: user.uid,
-      userName: user.displayName,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Clear the comment input
-    setNewComment('');
-  };
-
   const handleDeleteComment = async (commentId) => {
     const db = getDatabase();
     const commentRef = ref(db, `blogPosts/${postId}/comments/${commentId}`);
@@ -52,14 +32,10 @@ const Comments = ({ postId, user }) => {
 
   return (
     <div>
-      {/* Input field for new comments */}
-    
-
       {/* Render each comment */}
       {comments.map((comment) => (
         <Comment key={comment.id} comment={comment} user={user} onDelete={handleDeleteComment} />
       ))}
- 
     </div>
   );
 };

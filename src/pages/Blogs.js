@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, IconButton, Avatar, TextField, Paper, Typography, Divider, LinearProgress } from '@mui/material'; // Import LinearProgress for loading bar
+import { Button, IconButton, Avatar, TextField, Paper, Typography, Divider } from '@mui/material';
 import { auth } from '../firebaseConfig';
 import { getDatabase, ref, onValue, push } from 'firebase/database';
-
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import DeleteButton from './DeleteButton';
@@ -14,7 +13,6 @@ const Blogs = () => {
   const [commentText, setCommentText] = useState('');
   const [postTitle, setPostTitle] = useState('');
   const [imageFile, setImageFile] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0); // State to track upload progress
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -31,7 +29,7 @@ const Blogs = () => {
             id: key,
             ...value,
           }));
-          setBlogPosts(postsArray.reverse()); // Reverse the array here
+          setBlogPosts(postsArray.reverse());
         }
       });
     };
@@ -43,56 +41,14 @@ const Blogs = () => {
     };
   }, []);
 
-<<<<<<< HEAD
   const handleUpload = async () => {
-    if (!imageFile) return; // No file selected
+    if (!imageFile) return null; // No file selected
     const storage = getStorage();
     const imageRef = storageRef(storage, `images/${imageFile.name}`);
-    const uploadTask = uploadBytes(imageRef, imageFile);
-  
-    
-  
-    try {
-      await uploadTask;
-      const imageUrl = await getDownloadURL(imageRef);
-      setUploadProgress(0); // Reset upload progress
-      return imageUrl;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      // Handle error
-    }
+    await uploadBytes(imageRef, imageFile);
+    return getDownloadURL(imageRef); // Get download URL after upload
   };
-  
-=======
-const handleUpload = async () => {
-  if (!imageFile) return; // No file selected
-  const storage = getStorage();
-  const imageRef = storageRef(storage, `images/${imageFile.name}`);
-  const uploadTask = uploadBytes(imageRef, imageFile);
 
-  return new Promise((resolve, reject) => {
-    // Track upload progress
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        setUploadProgress(progress);
-      }, 
-      (error) => {
-        console.error('Error uploading image:', error);
-        reject(error);
-      }, 
-      () => {
-        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-          setUploadProgress(0); // Reset upload progress
-          resolve(downloadURL);
-        });
-      }
-    );
-  });
-};
-
-
->>>>>>> 247d632b1ebba9d8e9195825b66c40aac5cb18ad
   const handlePost = async () => {
     if (!postTitle.trim() || !commentText.trim() || !imageFile) return;
 
@@ -102,21 +58,20 @@ const handleUpload = async () => {
       content: commentText.trim(),
       author: user.displayName,
       date: new Date().toISOString(),
-      comments: [], // Initialize comments array
+      comments: [],
     };
 
     try {
-      const imageUrl = await handleUpload(); // Upload image and get URL
+      const imageUrl = await handleUpload();
       if (imageUrl) {
-        postData.imageUrl = imageUrl; // Set the image URL in the postData object
+        postData.imageUrl = imageUrl;
       }
       await push(ref(db, 'blogPosts'), postData);
       setPostTitle('');
       setCommentText('');
-      setImageFile(null); // Clear image file after upload
+      setImageFile(null);
     } catch (error) {
       console.error('Error uploading image:', error);
-      // Handle error
     }
   };
 
@@ -141,7 +96,6 @@ const handleUpload = async () => {
 
   return (
     <div style={styles.container}>
-      
       {user && (
         <Paper style={styles.postForm}>
           <TextField
@@ -164,7 +118,6 @@ const handleUpload = async () => {
               Upload Image
             </Button>
           </label>
-          {uploadProgress > 0 && <LinearProgress variant="determinate" value={uploadProgress} />} {/* Show progress bar if uploading */}
           <TextField
             multiline
             fullWidth
