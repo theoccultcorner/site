@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, Grid, Link } from '@mui/material';
 import './Contact.css'; // Import external CSS file for additional styling
-
+import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube, FaPatreon } from 'react-icons/fa';
 const Contact = () => {
   const [name, setName] = useState(''); // State for name input
   const [email, setEmail] = useState('');
@@ -49,11 +49,14 @@ const Contact = () => {
         <Typography variant="h4" gutterBottom>
           Send us a message.
         </Typography>
-        <div className="social-media">
-          <Link href="https://twitter.com/example" target="_blank" rel="noopener noreferrer">Twitter</Link>
-          <Link href="https://facebook.com/example" target="_blank" rel="noopener noreferrer">Facebook</Link>
-          <Link href="https://instagram.com/example" target="_blank" rel="noopener noreferrer">Instagram</Link>
-        </div>
+           <div style={styles.socialIcons}>
+        <a href="https://www.facebook.com/LorenzoNevarez" target="_blank" rel="noopener noreferrer"><FaFacebook size={30} style={styles.icon} /></a>
+        <a href="https://discord.gg/Jq8tw8h2" target="_blank" rel="noopener noreferrer"><FaDiscord size={30} style={styles.icon} /></a>
+        <a href="https://www.instagram.com/theoccultcorner" target="_blank" rel="noopener noreferrer"><FaInstagram size={30} style={styles.icon} /></a>
+        <a href="https://www.tiktok.com/@theoccultcorner" target="_blank" rel="noopener noreferrer"><FaTiktok size={30} style={styles.icon} /></a>
+        <a href="https://www.youtube.com/channel/UCzLm4X0CrxlSwRqggjvL3jA" target="_blank" rel="noopener noreferrer"><FaYoutube size={30} style={styles.icon} /></a>
+        <a href="https://www.patreon.com/occultcorner" target="_blank" rel="noopener noreferrer"><FaPatreon size={30} style={styles.icon} /></a>
+      </div>
         <form onSubmit={handleSubmit} className="contact-form">
           <Grid container spacing={2}>
             <Grid item xs={12}>
