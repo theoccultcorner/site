@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Avatar } from '@mui/material';
-import { Outlet, Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 
 const Layout = () => {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -45,8 +45,18 @@ const Layout = () => {
   };
 
   const goToProfile = () => {
-    setAnchorEl(null); // Close the menu
-    navigate('/profile'); // Navigate to the profile page
+    setAnchorEl(null);
+    navigate('/profile');
+  };
+
+  const goToBlogs = () => {
+    setAnchorEl(null);
+    navigate('/blogs');
+  };
+
+  const goToContact = () => {
+    setAnchorEl(null);
+    navigate('/contact');
   };
 
   return (
@@ -56,8 +66,6 @@ const Layout = () => {
           <Typography variant="h6" component={Link} to="/" style={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
             TheGnosticChristian
           </Typography>
-          <Button component={Link} to="/blogs" color="inherit">Blogs</Button>
-          <Button component={Link} to="/contact" color="inherit">Contact</Button>
           {user ? (
             <div>
               <IconButton
@@ -89,7 +97,9 @@ const Layout = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={goToProfile}>Profile</MenuItem> {/* Update Profile menu item */}
+                <MenuItem onClick={goToProfile}>Profile</MenuItem>
+                <MenuItem onClick={goToBlogs}>Blogs</MenuItem>
+                <MenuItem onClick={goToContact}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </div>
