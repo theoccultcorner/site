@@ -53,15 +53,7 @@ const Comments = ({ postId, user }) => {
   return (
     <div>
       {/* Input field for new comments */}
-      <TextField
-        value={newComment}
-        onChange={(e) => setNewComment(e.target.value)}
-        label="Add a comment"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-      />
-      <Button variant="contained" onClick={handleComment}>Comment</Button>
+    
 
       {/* Render each comment */}
       {comments.map((comment) => (

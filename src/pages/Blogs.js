@@ -43,6 +43,7 @@ const Blogs = () => {
     };
   }, []);
 
+<<<<<<< HEAD
   const handleUpload = async () => {
     if (!imageFile) return; // No file selected
     const storage = getStorage();
@@ -62,6 +63,36 @@ const Blogs = () => {
     }
   };
   
+=======
+const handleUpload = async () => {
+  if (!imageFile) return; // No file selected
+  const storage = getStorage();
+  const imageRef = storageRef(storage, `images/${imageFile.name}`);
+  const uploadTask = uploadBytes(imageRef, imageFile);
+
+  return new Promise((resolve, reject) => {
+    // Track upload progress
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        setUploadProgress(progress);
+      }, 
+      (error) => {
+        console.error('Error uploading image:', error);
+        reject(error);
+      }, 
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          setUploadProgress(0); // Reset upload progress
+          resolve(downloadURL);
+        });
+      }
+    );
+  });
+};
+
+
+>>>>>>> 247d632b1ebba9d8e9195825b66c40aac5cb18ad
   const handlePost = async () => {
     if (!postTitle.trim() || !commentText.trim() || !imageFile) return;
 
