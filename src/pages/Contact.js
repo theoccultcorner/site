@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, Grid, Link } from '@mui/material';
 import './Contact.css'; // Import external CSS file for additional styling
-import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube, FaPatreon } from 'react-icons/fa';
+ 
 const Contact = () => {
   const [name, setName] = useState(''); // State for name input
   const [email, setEmail] = useState('');
