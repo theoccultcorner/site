@@ -41,28 +41,33 @@ const Blogs = () => {
     };
   }, []);
 
-  const handleUpload = async () => {
-    if (!imageFile) return; // No file selected
-    const storage = getStorage();
-    const imageRef = storageRef(storage, `images/${imageFile.name}`);
-    const uploadTask = uploadBytes(imageRef, imageFile);
+const handleUpload = async () => {
+  if (!imageFile) return; // No file selected
+  const storage = getStorage();
+  const imageRef = storageRef(storage, `images/${imageFile.name}`);
+  const uploadTask = uploadBytes(imageRef, imageFile);
 
+  return new Promise((resolve, reject) => {
     // Track upload progress
-    uploadTask.on('state_changed', (snapshot) => {
-      const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-      setUploadProgress(progress);
-    });
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        setUploadProgress(progress);
+      }, 
+      (error) => {
+        console.error('Error uploading image:', error);
+        reject(error);
+      }, 
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          setUploadProgress(0); // Reset upload progress
+          resolve(downloadURL);
+        });
+      }
+    );
+  });
+};
 
-    try {
-      await uploadTask;
-      const imageUrl = await getDownloadURL(imageRef);
-      setUploadProgress(0); // Reset upload progress
-      return imageUrl;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      // Handle error
-    }
-  };
 
   const handlePost = async () => {
     if (!postTitle.trim() || !commentText.trim() || !imageFile) return;
