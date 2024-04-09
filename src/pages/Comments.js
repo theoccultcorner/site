@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, IconButton, Avatar, Typography } from '@mui/material';
+import { Grid, IconButton, Avatar, Typography, TextField, Button } from '@mui/material';
 import { getDatabase, ref, push, onValue, remove } from 'firebase/database';
 
 const Comments = ({ postId, user }) => {
@@ -52,6 +52,17 @@ const Comments = ({ postId, user }) => {
 
   return (
     <div>
+      {/* Input field for new comments */}
+      <TextField
+        value={newComment}
+        onChange={(e) => setNewComment(e.target.value)}
+        label="Add a comment"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+      />
+      <Button variant="contained" onClick={handleComment}>Comment</Button>
+
       {/* Render each comment */}
       {comments.map((comment) => (
         <Comment key={comment.id} comment={comment} user={user} onDelete={handleDeleteComment} />
