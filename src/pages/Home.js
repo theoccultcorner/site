@@ -27,7 +27,7 @@ const Home = () => {
         <a href="https://www.instagram.com/theoccultcorner" target="_blank" rel="noopener noreferrer"><FaInstagram size={30} style={styles.icon} /></a>
         <a href="https://www.tiktok.com/@theoccultcorner" target="_blank" rel="noopener noreferrer"><FaTiktok size={30} style={styles.icon} /></a>
         <a href="https://www.youtube.com/channel/UCzLm4X0CrxlSwRqggjvL3jA" target="_blank" rel="noopener noreferrer"><FaYoutube size={30} style={styles.icon} /></a>
-        <a href="https://www.patreon.com/occultcorner" target="_blank" rel="noopener noreferrer"><FaPatreon size={30} style={styles.icon} /></a>
+ 
       </div>
     </div>
   );
