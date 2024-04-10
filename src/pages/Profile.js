@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Avatar, TextField, Paper, Typography } from '@mui/material';
 import { auth } from '../firebaseConfig';
 import { getDatabase, ref, update, get } from 'firebase/database';
+import { db } from '../firebaseConfig'; // Import Firestore db instance
+import { collection, doc, getDoc, updateDoc } from 'firebase/firestore'; // Import updateDoc from firestore
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -10,37 +12,41 @@ const Profile = () => {
   const [bio, setBio] = useState('');
   const [website, setWebsite] = useState('');
   const [loading, setLoading] = useState(false);
+  const [profileData, setProfileData] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
       if (user) {
         setDisplayName(user.displayName || '');
         setPhotoURL(user.photoURL || '');
-        // Fetch additional profile data from the database if available
-        fetchProfileData(user.uid);
+        // Fetch additional profile data from Firestore if available
+        await fetchProfileData(user.uid);
       }
     });
     return () => unsubscribe();
   }, []);
 
   const fetchProfileData = async (userId) => {
-    const db = getDatabase();
-    const userRef = ref(db, `users/${userId}`);
-    const snapshot = await get(userRef);
-    if (snapshot.exists()) {
-      const userData = snapshot.val();
-      setBio(userData.bio || '');
-      setWebsite(userData.website || '');
+    try {
+      const docRef = doc(db, 'profiles', userId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        setBio(userData.bio || '');
+        setWebsite(userData.website || '');
+        setProfileData(userData); // Set all profile data
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
     }
   };
 
   const handleSaveProfile = async () => {
     setLoading(true);
-    const db = getDatabase();
-    const userRef = ref(db, `users/${user.uid}`);
     try {
-      await update(userRef, {
+      const docRef = doc(db, 'profiles', user.uid);
+      await updateDoc(docRef, { // Change from update to updateDoc
         displayName: displayName.trim(),
         photoURL: photoURL.trim(),
         bio: bio.trim(),
@@ -95,6 +101,14 @@ const Profile = () => {
       >
         {loading ? 'Saving...' : 'Save Profile'}
       </Button>
+
+      {profileData && (
+        <div>
+          <Typography variant="h5" style={{ marginTop: '20px' }}>Profile Data</Typography>
+          <Typography><strong>Email:</strong> {profileData.email}</Typography>
+          {/* Display other profile attributes here */}
+        </div>
+      )}
     </Paper>
   );
 };

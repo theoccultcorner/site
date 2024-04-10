@@ -6,6 +6,7 @@ import Blogs from "./pages/Blogs";
 import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
 import Profile from './pages/Profile';
+import ProfileList from './pages/ProfileList';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="profiles" element={<ProfileList />} />
           <Route path="blogs" element={<Blogs />} />
           <Route path="contact" element={<Contact />} />
           <Route path="*" element={<NoPage />} />

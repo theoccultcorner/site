@@ -1,0 +1,58 @@
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import { Avatar } from '@mui/material'; // Import Avatar from MUI
+
+function ProfileList() {
+  const [loading, setLoading] = useState(true);
+  const [profiles, setProfiles] = useState([]);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'profiles'));
+        const fetchedProfiles = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProfiles(fetchedProfiles);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching profiles:', error);
+      }
+    };
+
+    fetchProfiles();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      <h2>Profiles</h2>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {profiles.map(profile => (
+          <li key={profile.id} style={{ marginBottom: '20px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+        
+            <Avatar src={profile.photoURL} alt={profile.displayName} sx={{ width: 100, height: 100, marginBottom: 2 }} />
+           
+            <div>
+              <strong>Name:</strong> {profile.displayName}
+            </div>
+            <div>
+              <strong>Email:</strong> {profile.email}
+            </div> 
+            <div>
+              <strong>Bio:</strong> {profile.bio}
+            </div> 
+            <div>
+              <strong>Website:</strong> {profile.website}
+            </div> 
+            {/* Add more profile details here */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default ProfileList;

@@ -3,6 +3,8 @@ import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Avatar
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
 const Layout = () => {
   const [user, setUser] = useState(null);
@@ -21,6 +23,18 @@ const Layout = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
+
+      // Store user profile in Firestore if not already stored
+      const userRef = doc(db, 'profiles', result.user.uid);
+      const docSnap = await getDoc(userRef);
+      if (!docSnap.exists()) {
+        await setDoc(userRef, {
+          email: result.user.email,
+          displayName: result.user.displayName,
+          photoURL: result.user.photoURL
+          // Add more profile data as needed
+        });
+      }
     } catch (error) {
       console.error('Error occurred during login:', error);
     }
@@ -47,6 +61,11 @@ const Layout = () => {
   const goToProfile = () => {
     setAnchorEl(null);
     navigate('/profile');
+  };
+
+  const goToProfiles = () => {
+    setAnchorEl(null);
+    navigate('/profiles');
   };
 
   const goToBlogs = () => {
@@ -98,6 +117,7 @@ const Layout = () => {
                 onClose={handleClose}
               >
                 <MenuItem onClick={goToProfile}>Profile</MenuItem>
+                <MenuItem onClick={goToProfiles}>Profiles</MenuItem>
                 <MenuItem onClick={goToBlogs}>Blogs</MenuItem>
                 <MenuItem onClick={goToContact}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
