@@ -138,8 +138,12 @@ const Blogs = () => {
             <Typography variant="h5" style={styles.articleTitle}>
               {post.title}
             </Typography>
-            <Typography variant="subtitle2" style={styles.articleMeta}>
-              By {post.author} | {post.date}
+            <Typography variant="subtitle1" style={styles.author}>
+              <Avatar src={user.photoURL} alt={user.displayName} style={styles.avatar} />
+              {post.author}
+            </Typography>
+            <Typography variant="subtitle2" style={styles.date}>
+              {new Date(post.date).toLocaleString()}
             </Typography>
             {user && <DeleteButton postId={post.id} />}
             <Divider style={{ margin: '10px 0' }} />
@@ -202,9 +206,17 @@ const styles = {
   articleTitle: {
     marginBottom: '10px',
   },
-  articleMeta: {
-    color: '#666',
+  author: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '5px',
+  },
+  avatar: {
+    marginRight: '10px',
+  },
+  date: {
     marginBottom: '10px',
+    color: '#666',
   },
   image: {
     width: '100%',

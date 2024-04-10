@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Avatar
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore'; // Import Firestore functions
 import { db } from '../firebaseConfig';
 
 const Layout = () => {
@@ -35,6 +35,15 @@ const Layout = () => {
           // Add more profile data as needed
         });
       }
+
+      // Example: Add a document to a collection
+      const blogCollection = collection(db, 'blogs');
+      await addDoc(blogCollection, {
+        title: 'New Blog Post',
+        content: 'This is the content of the new blog post.',
+        author: result.user.uid
+      });
+
     } catch (error) {
       console.error('Error occurred during login:', error);
     }
@@ -117,7 +126,7 @@ const Layout = () => {
                 onClose={handleClose}
               >
                 <MenuItem onClick={goToProfile}>Profile</MenuItem>
-                <MenuItem onClick={goToProfiles}>Profiles</MenuItem>
+                <MenuItem onClick={goToProfiles}>Community</MenuItem>
                 <MenuItem onClick={goToBlogs}>Blogs</MenuItem>
                 <MenuItem onClick={goToContact}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
