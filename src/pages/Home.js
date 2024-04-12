@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube, FaPatreon } from 'react-icons/fa';
+import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube  } from 'react-icons/fa';
 
 const Home = () => {
   return (

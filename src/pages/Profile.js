@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Avatar, TextField, Paper, Typography } from '@mui/material';
 import { auth } from '../firebaseConfig';
-import { getDatabase, ref, update, get } from 'firebase/database';
 import { db } from '../firebaseConfig'; // Import Firestore db instance
-import { collection, doc, getDoc, updateDoc } from 'firebase/firestore'; // Import updateDoc from firestore
+import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Import updateDoc from firestore
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -46,7 +45,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const docRef = doc(db, 'profiles', user.uid);
-      await updateDoc(docRef, { // Change from update to updateDoc
+      await updateDoc(docRef, {
         displayName: displayName.trim(),
         photoURL: photoURL.trim(),
         bio: bio.trim(),

@@ -139,7 +139,9 @@ const Blogs = () => {
               {post.title}
             </Typography>
             <Typography variant="subtitle1" style={styles.author}>
-              <Avatar src={user.photoURL} alt={user.displayName} style={styles.avatar} />
+              {user && user.photoURL && (
+                <Avatar src={user.photoURL} alt={user.displayName} style={styles.avatar} />
+              )}
               {post.author}
             </Typography>
             <Typography variant="subtitle2" style={styles.date}>

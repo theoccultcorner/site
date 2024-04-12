@@ -72,6 +72,11 @@ const Layout = () => {
     navigate('/profile');
   };
 
+  const goToMeta = () => {
+    setAnchorEl(null);
+    navigate('/meta');
+  };
+
   const goToProfiles = () => {
     setAnchorEl(null);
     navigate('/profiles');
@@ -127,6 +132,7 @@ const Layout = () => {
               >
                 <MenuItem onClick={goToProfile}>Profile</MenuItem>
                 <MenuItem onClick={goToProfiles}>Community</MenuItem>
+                <MenuItem onClick={goToMeta}>Pleroma</MenuItem>
                 <MenuItem onClick={goToBlogs}>Blogs</MenuItem>
                 <MenuItem onClick={goToContact}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
