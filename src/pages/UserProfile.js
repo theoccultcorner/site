@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig'; // Import Firestore database instance
-import { Avatar } from '@mui/material';
+import { Avatar, Card, CardContent, Typography } from '@mui/material';
 
 function UserProfile() {
   const { displayName } = useParams(); // Get the displayName from URL parameter
@@ -43,22 +43,25 @@ function UserProfile() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h2>User Profile</h2>
-      <Avatar src={profile.photoURL} alt={profile.displayName} sx={{ width: 100, height: 100, marginBottom: 5 }} />
-      <div>
-        <strong>Name:</strong> {profile.displayName}
-      </div>
-      <div>
-        <strong>Email:</strong> {profile.email}
-      </div> 
-      <div>
-        <strong>Bio:</strong> {profile.bio}
-      </div> 
-      <div>
-        <strong>Website:</strong> {profile.website}
-      </div> 
-      {/* Add more profile details here */}
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+      <Card sx={{ maxWidth: 600 }}>
+        <CardContent style={{ textAlign: 'center' }}>
+          <Avatar src={profile.photoURL} alt={profile.displayName} sx={{ width: 100, height: 100, marginBottom: 2 }} />
+          <Typography variant="h5" gutterBottom>
+            {profile.displayName}
+          </Typography>
+          <Typography variant="body1" color="textSecondary" gutterBottom>
+            {profile.email}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {profile.bio}
+          </Typography>
+          <Typography variant="body1" color="textSecondary" gutterBottom>
+            {profile.website}
+          </Typography>
+          {/* Add more profile details here */}
+        </CardContent>
+      </Card>
     </div>
   );
 }
