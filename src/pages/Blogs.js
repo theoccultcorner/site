@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, IconButton, Avatar, TextField, Paper, Typography, Divider } from '@mui/material';
+import { Button, Avatar, TextField, Paper, Typography, Divider } from '@mui/material';
 import { auth } from '../firebaseConfig';
 import { getDatabase, ref, onValue, push, update, remove } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-
 import DeleteButton from './DeleteButton';
 import Comments from './Comments';
+import Likes from './Likes';
 
 const Blogs = () => {
   const [user, setUser] = useState(null);
@@ -83,12 +83,6 @@ const Blogs = () => {
     }
   };
 
-  const handleEdit = (postId, postTitle, postContent) => {
-    setEditingPostId(postId);
-    setPostTitle(postTitle);
-    setPostContent(postContent);
-  };
-
   const handleDelete = async (postId) => {
     const db = getDatabase();
     if (window.confirm('Are you sure you want to delete this post?')) {
@@ -107,12 +101,6 @@ const Blogs = () => {
       timestamp: new Date().toISOString(),
     });
     setCommentText('');
-  };
-
-  const handleLike = async (postId) => {
-    const db = getDatabase();
-    const likesRef = ref(db, `blogPosts/${postId}/likes/${user.uid}`);
-    await push(likesRef, true);
   };
 
   return (
@@ -169,17 +157,18 @@ const Blogs = () => {
               {new Date(post.date).toLocaleString()}
             </Typography>
             {user && user.uid === post.userId && (
-              <div>
-                <Button onClick={() => handleEdit(post.id, post.title, post.content)} variant="outlined" color="primary">
-                  Edit
-                </Button>
-                <DeleteButton postId={post.id} handleDelete={handleDelete} />
-              </div>
-            )}
+  <DeleteButton postId={post.id} />
+)}
+
             <Divider style={{ margin: '10px 0' }} />
             {post.imageUrl && <img src={post.imageUrl} alt="Post" style={styles.image} />}
             <Typography style={styles.articleContent}>{post.content}</Typography>
-            <Comments postId={post.id} user={user} comments={post.comments} />
+            <Comments
+              postId={post.id}
+              user={user}
+              comments={post.comments}
+              allowDelete={user && user.uid === post.userId}
+            />
             <TextField
               fullWidth
               variant="outlined"
@@ -191,15 +180,7 @@ const Blogs = () => {
             <Button onClick={() => handleComment(post.id)} variant="contained" color="primary">
               Comment
             </Button>
-            {user && (
-              <IconButton onClick={() => handleLike(post.id)}>
-                {user.photoURL ? (
-                  <Avatar src={user.photoURL} alt={user.displayName} />
-                ) : (
-                  <Avatar>{user.displayName.charAt(0)}</Avatar>
-                )}
-              </IconButton>
-            )}
+            <Likes postId={post.id} user={user} />
           </Paper>
         ))}
       </div>
