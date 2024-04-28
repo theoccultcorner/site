@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Avatar
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore'; // Import Firestore functions
+import { doc, getDoc, setDoc } from 'firebase/firestore'; // Import Firestore functions
 import { db } from '../firebaseConfig';
 
 const Layout = () => {
@@ -23,31 +23,30 @@ const Layout = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
-
-      // Store user profile in Firestore if not already stored
+  
+      // Check if user profile already exists in Firestore
       const userRef = doc(db, 'profiles', result.user.uid);
       const docSnap = await getDoc(userRef);
       if (!docSnap.exists()) {
+        // If profile doesn't exist, create a new one with sample data
         await setDoc(userRef, {
           email: result.user.email,
           displayName: result.user.displayName,
-          photoURL: result.user.photoURL
-          // Add more profile data as needed
+          photoURL: result.user.photoURL,
+          // Assign temporary sample data
+          bio: 'This is a sample bio',
+          website: 'https://example.com',
         });
       }
-
-      // Example: Add a document to a collection
-      const blogCollection = collection(db, 'blogs');
-      await addDoc(blogCollection, {
-        title: 'New Blog Post',
-        content: 'This is the content of the new blog post.',
-        author: result.user.uid
-      });
-
+  
+      // Redirect to profile page
+      navigate('/profile');
+  
     } catch (error) {
       console.error('Error occurred during login:', error);
     }
   };
+  
 
   const handleLogout = async () => {
     try {

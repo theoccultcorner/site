@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, IconButton, Avatar, TextField, Paper, Typography, Divider } from '@mui/material';
 import { auth } from '../firebaseConfig';
-import { getDatabase, ref, onValue, push } from 'firebase/database';
+import { getDatabase, ref, onValue, push, update, remove } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import DeleteButton from './DeleteButton';
@@ -12,7 +12,9 @@ const Blogs = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [postTitle, setPostTitle] = useState('');
+  const [postContent, setPostContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [editingPostId, setEditingPostId] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -50,12 +52,12 @@ const Blogs = () => {
   };
 
   const handlePost = async () => {
-    if (!postTitle.trim() || !commentText.trim() || !imageFile) return;
+    if (!postTitle.trim() || !postContent.trim() || !imageFile) return;
 
     const db = getDatabase();
     const postData = {
       title: postTitle.trim(),
-      content: commentText.trim(),
+      content: postContent.trim(),
       author: user.displayName,
       date: new Date().toISOString(),
       comments: [],
@@ -66,12 +68,31 @@ const Blogs = () => {
       if (imageUrl) {
         postData.imageUrl = imageUrl;
       }
-      await push(ref(db, 'blogPosts'), postData);
+      if (editingPostId) {
+        await update(ref(db, `blogPosts/${editingPostId}`), postData);
+        setEditingPostId(null);
+      } else {
+        await push(ref(db, 'blogPosts'), postData);
+      }
       setPostTitle('');
+      setPostContent('');
       setCommentText('');
       setImageFile(null);
     } catch (error) {
       console.error('Error uploading image:', error);
+    }
+  };
+
+  const handleEdit = (postId, postTitle, postContent) => {
+    setEditingPostId(postId);
+    setPostTitle(postTitle);
+    setPostContent(postContent);
+  };
+
+  const handleDelete = async (postId) => {
+    const db = getDatabase();
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      await remove(ref(db, `blogPosts/${postId}`));
     }
   };
 
@@ -123,12 +144,12 @@ const Blogs = () => {
             fullWidth
             variant="outlined"
             placeholder="Write your post..."
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
+            value={postContent}
+            onChange={(e) => setPostContent(e.target.value)}
             style={styles.input}
           />
           <Button onClick={handlePost} variant="contained" color="primary">
-            Post
+            {editingPostId ? 'Update Post' : 'Post'}
           </Button>
         </Paper>
       )}
@@ -147,7 +168,14 @@ const Blogs = () => {
             <Typography variant="subtitle2" style={styles.date}>
               {new Date(post.date).toLocaleString()}
             </Typography>
-            {user && <DeleteButton postId={post.id} />}
+            {user && user.uid === post.userId && (
+              <div>
+                <Button onClick={() => handleEdit(post.id, post.title, post.content)} variant="outlined" color="primary">
+                  Edit
+                </Button>
+                <DeleteButton postId={post.id} handleDelete={handleDelete} />
+              </div>
+            )}
             <Divider style={{ margin: '10px 0' }} />
             {post.imageUrl && <img src={post.imageUrl} alt="Post" style={styles.image} />}
             <Typography style={styles.articleContent}>{post.content}</Typography>
