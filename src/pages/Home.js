@@ -1,33 +1,45 @@
 import React from 'react';
-import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube  } from 'react-icons/fa';
+import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 
 const Home = () => {
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Welcome to The Gnostic Christian</h1>
-      <p style={styles.subtitle}>Exploring the Ancient Wisdom of Gnosticism</p>
-    
-     
+      <h1 style={styles.title}>Welcome to TheGnosticChristian.Org</h1>
+      <p style={styles.subtitle}>The Social Pleroma for Gnostikoi.</p>
 
       <p style={styles.description}>
-        TheGnosticChristian.org is dedicated to uncovering the rich history and profound teachings of Gnosticism. 
-        Gnosticism was a diverse spiritual movement that emerged in the early centuries of Christianity, offering 
-        alternative interpretations of Christian doctrine and emphasizing personal spiritual knowledge (gnosis) 
-        as the path to salvation.
+        TheGnosticChristian.org is a vibrant and inclusive social platform designed for Gnostikoi – seekers of spiritual wisdom
+        and knowledge. It serves as a gathering place for individuals interested in exploring ancient Gnostic teachings, engaging
+        in meaningful discussions, and connecting with like-minded individuals from around the world.
       </p>
-      
+
       <p style={styles.description}>
-        On this website, you'll find articles, resources, and discussions exploring various aspects of Gnostic 
-        belief, including the role of myth, the nature of the divine, and the significance of esoteric knowledge. 
-        Join us on a journey to discover the hidden truths of Gnosticism and its enduring relevance in the modern world.
+        On this website, you'll find a rich tapestry of content, including articles, forums, and multimedia resources, all aimed at
+        deepening your understanding of Gnosticism and its relevance to contemporary spiritual pursuits.
       </p>
+
+      <p style={styles.description}>
+        As a member of TheGnosticChristian.org, you'll have the opportunity to create and customize your profile, sharing
+        information about yourself and your spiritual journey with the community. Additionally, you can participate in discussions,
+        post your own thoughts and insights, and engage with other members through comments and private messages.
+      </p>
+
       <div style={styles.socialIcons}>
-        <a href="https://www.facebook.com/LorenzoNevarez" target="_blank" rel="noopener noreferrer"><FaFacebook size={30} style={styles.icon} /></a>
-        <a href="https://discord.gg/Jq8tw8h2" target="_blank" rel="noopener noreferrer"><FaDiscord size={30} style={styles.icon} /></a>
-        <a href="https://www.instagram.com/theoccultcorner" target="_blank" rel="noopener noreferrer"><FaInstagram size={30} style={styles.icon} /></a>
-        <a href="https://www.tiktok.com/@theoccultcorner" target="_blank" rel="noopener noreferrer"><FaTiktok size={30} style={styles.icon} /></a>
-        <a href="https://www.youtube.com/channel/UCzLm4X0CrxlSwRqggjvL3jA" target="_blank" rel="noopener noreferrer"><FaYoutube size={30} style={styles.icon} /></a>
- 
+        <a href="https://www.facebook.com/LorenzoNevarez" target="_blank" rel="noopener noreferrer">
+          <FaFacebook size={30} style={styles.icon} />
+        </a>
+        <a href="https://discord.gg/Jq8tw8h2" target="_blank" rel="noopener noreferrer">
+          <FaDiscord size={30} style={styles.icon} />
+        </a>
+        <a href="https://www.instagram.com/theoccultcorner" target="_blank" rel="noopener noreferrer">
+          <FaInstagram size={30} style={styles.icon} />
+        </a>
+        <a href="https://www.tiktok.com/@theoccultcorner" target="_blank" rel="noopener noreferrer">
+          <FaTiktok size={30} style={styles.icon} />
+        </a>
+        <a href="https://www.youtube.com/channel/UCzLm4X0CrxlSwRqggjvL3jA" target="_blank" rel="noopener noreferrer">
+          <FaYoutube size={30} style={styles.icon} />
+        </a>
       </div>
     </div>
   );
@@ -52,6 +64,7 @@ const styles = {
     fontSize: '18px',
     color: '#777',
     marginTop: '20px',
+    lineHeight: '1.6',
   },
   socialIcons: {
     marginTop: '40px',
