@@ -4,7 +4,7 @@ import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube } from 'react-i
 const Home = () => {
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Welcome to TheGnosticChristian.Org</h1>
+      <h1 style={styles.title}>Welcome to The Gnostic Christian.Org</h1>
       <p style={styles.subtitle}>The Social Pleroma for Gnostikoi.</p>
 
       <p style={styles.description}>
