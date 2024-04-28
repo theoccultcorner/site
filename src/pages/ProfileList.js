@@ -31,7 +31,7 @@ function ProfileList() {
 
   return (
     <div>
-      <h2>Profiles</h2>
+ 
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {profiles.map(profile => (
           <li key={profile.id} style={{ marginBottom: '20px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
