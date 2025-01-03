@@ -148,6 +148,7 @@ const Blogs = () => {
               {new Date(post.date).toLocaleString()}
             </Typography>
             {user && <DeleteButton postId={post.id} />}
+ 
             <Divider style={{ margin: '10px 0' }} />
             {post.imageUrl && <img src={post.imageUrl} alt="Post" style={styles.image} />}
             <Typography style={styles.articleContent}>{post.content}</Typography>
