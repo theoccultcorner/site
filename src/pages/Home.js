@@ -2,7 +2,7 @@ import React from 'react';
 import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 
 const Home = () => {
-  return (
+  return ( 
     <div style={styles.container}>
       <h1 style={styles.title}>Welcome to The Gnostic Union</h1>
       <p style={styles.subtitle}>Exploring the Ancient Wisdom of Gnosticism</p>
