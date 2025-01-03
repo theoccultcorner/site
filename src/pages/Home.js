@@ -1,9 +1,10 @@
 import React from 'react';
-import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube  } from 'react-icons/fa';
+import { FaFacebook, FaDiscord, FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa';
 
 const Home = () => {
   return (
     <div style={styles.container}>
+<<<<<<< HEAD
       <h1 style={styles.title}>Welcome to The Gnostic Union</h1>
       <p style={styles.subtitle}>Exploring the Ancient Wisdom of Gnosticism</p>
     
@@ -36,6 +37,44 @@ Gnostic Christian Theology differs greatly from Roman Catholicism and Eastern Or
         <a href="https://discord.gg/Jq8tw8h2" target="_blank" rel="noopener noreferrer"><FaDiscord size={30} style={styles.icon} /></a>
         <a href="https://www.youtube.com/@TheGnosticCatholicUnion" target="_blank" rel="noopener noreferrer"><FaYoutube size={30} style={styles.icon} /></a>
  
+=======
+      <h1 style={styles.title}>Welcome to The Gnostic Christian.Org</h1>
+      <p style={styles.subtitle}>The Social Pleroma for Gnostikoi.</p>
+
+      <p style={styles.description}>
+        TheGnosticChristian.org is a vibrant and inclusive social platform designed for Gnostikoi – seekers of spiritual wisdom
+        and knowledge. It serves as a gathering place for individuals interested in exploring ancient Gnostic teachings, engaging
+        in meaningful discussions, and connecting with like-minded individuals from around the world.
+      </p>
+
+      <p style={styles.description}>
+        On this website, you'll find a rich tapestry of content, including articles, forums, and multimedia resources, all aimed at
+        deepening your understanding of Gnosticism and its relevance to contemporary spiritual pursuits.
+      </p>
+
+      <p style={styles.description}>
+        As a member of TheGnosticChristian.org, you'll have the opportunity to create and customize your profile, sharing
+        information about yourself and your spiritual journey with the community. Additionally, you can participate in discussions,
+        post your own thoughts and insights, and engage with other members through comments and private messages.
+      </p>
+
+      <div style={styles.socialIcons}>
+        <a href="https://www.facebook.com/LorenzoNevarez" target="_blank" rel="noopener noreferrer">
+          <FaFacebook size={30} style={styles.icon} />
+        </a>
+        <a href="https://discord.gg/Jq8tw8h2" target="_blank" rel="noopener noreferrer">
+          <FaDiscord size={30} style={styles.icon} />
+        </a>
+        <a href="https://www.instagram.com/theoccultcorner" target="_blank" rel="noopener noreferrer">
+          <FaInstagram size={30} style={styles.icon} />
+        </a>
+        <a href="https://www.tiktok.com/@theoccultcorner" target="_blank" rel="noopener noreferrer">
+          <FaTiktok size={30} style={styles.icon} />
+        </a>
+        <a href="https://www.youtube.com/channel/UCzLm4X0CrxlSwRqggjvL3jA" target="_blank" rel="noopener noreferrer">
+          <FaYoutube size={30} style={styles.icon} />
+        </a>
+>>>>>>> 3b672186bf7fc6c4041a7d83ce9bf38a2803f049
       </div>
     </div>
   );
@@ -60,6 +99,7 @@ const styles = {
     fontSize: '18px',
     color: '#777',
     marginTop: '20px',
+    lineHeight: '1.6',
   },
   socialIcons: {
     marginTop: '40px',

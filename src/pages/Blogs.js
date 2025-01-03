@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Button, IconButton, Avatar, TextField, Paper, Typography, Divider } from '@mui/material';
+import { Button, Avatar, TextField, Paper, Typography, Divider } from '@mui/material';
 import { auth } from '../firebaseConfig';
-import { getDatabase, ref, onValue, push } from 'firebase/database';
+import { getDatabase, ref, onValue, push, update, remove } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-
 import DeleteButton from './DeleteButton';
 import Comments from './Comments';
+import Likes from './Likes';
 
 const Blogs = () => {
   const [user, setUser] = useState(null);
   const [blogPosts, setBlogPosts] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [postTitle, setPostTitle] = useState('');
+  const [postContent, setPostContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [editingPostId, setEditingPostId] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -50,12 +52,12 @@ const Blogs = () => {
   };
 
   const handlePost = async () => {
-    if (!postTitle.trim() || !commentText.trim() || !imageFile) return;
+    if (!postTitle.trim() || !postContent.trim() || !imageFile) return;
 
     const db = getDatabase();
     const postData = {
       title: postTitle.trim(),
-      content: commentText.trim(),
+      content: postContent.trim(),
       author: user.displayName,
       date: new Date().toISOString(),
       comments: [],
@@ -66,12 +68,25 @@ const Blogs = () => {
       if (imageUrl) {
         postData.imageUrl = imageUrl;
       }
-      await push(ref(db, 'blogPosts'), postData);
+      if (editingPostId) {
+        await update(ref(db, `blogPosts/${editingPostId}`), postData);
+        setEditingPostId(null);
+      } else {
+        await push(ref(db, 'blogPosts'), postData);
+      }
       setPostTitle('');
+      setPostContent('');
       setCommentText('');
       setImageFile(null);
     } catch (error) {
       console.error('Error uploading image:', error);
+    }
+  };
+
+  const handleDelete = async (postId) => {
+    const db = getDatabase();
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      await remove(ref(db, `blogPosts/${postId}`));
     }
   };
 
@@ -86,12 +101,6 @@ const Blogs = () => {
       timestamp: new Date().toISOString(),
     });
     setCommentText('');
-  };
-
-  const handleLike = async (postId) => {
-    const db = getDatabase();
-    const likesRef = ref(db, `blogPosts/${postId}/likes/${user.uid}`);
-    await push(likesRef, true);
   };
 
   return (
@@ -123,12 +132,12 @@ const Blogs = () => {
             fullWidth
             variant="outlined"
             placeholder="Write your post..."
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
+            value={postContent}
+            onChange={(e) => setPostContent(e.target.value)}
             style={styles.input}
           />
           <Button onClick={handlePost} variant="contained" color="primary">
-            Post
+            {editingPostId ? 'Update Post' : 'Post'}
           </Button>
         </Paper>
       )}
@@ -147,12 +156,24 @@ const Blogs = () => {
             <Typography variant="subtitle2" style={styles.date}>
               {new Date(post.date).toLocaleString()}
             </Typography>
+<<<<<<< HEAD
             {user && <DeleteButton postId={post.id} />}
  
+=======
+            {user && user.uid === post.userId && (
+  <DeleteButton postId={post.id} />
+)}
+
+>>>>>>> 3b672186bf7fc6c4041a7d83ce9bf38a2803f049
             <Divider style={{ margin: '10px 0' }} />
             {post.imageUrl && <img src={post.imageUrl} alt="Post" style={styles.image} />}
             <Typography style={styles.articleContent}>{post.content}</Typography>
-            <Comments postId={post.id} user={user} comments={post.comments} />
+            <Comments
+              postId={post.id}
+              user={user}
+              comments={post.comments}
+              allowDelete={user && user.uid === post.userId}
+            />
             <TextField
               fullWidth
               variant="outlined"
@@ -164,15 +185,7 @@ const Blogs = () => {
             <Button onClick={() => handleComment(post.id)} variant="contained" color="primary">
               Comment
             </Button>
-            {user && (
-              <IconButton onClick={() => handleLike(post.id)}>
-                {user.photoURL ? (
-                  <Avatar src={user.photoURL} alt={user.displayName} />
-                ) : (
-                  <Avatar>{user.displayName.charAt(0)}</Avatar>
-                )}
-              </IconButton>
-            )}
+            <Likes postId={post.id} user={user} />
           </Paper>
         ))}
       </div>

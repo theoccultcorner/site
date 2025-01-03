@@ -13,10 +13,12 @@ function ProfileList() {
       try {
         const querySnapshot = await getDocs(collection(db, 'profiles'));
         const fetchedProfiles = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         setProfiles(fetchedProfiles);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching profiles:', error);
+        setLoading(false);
       }
     };
 
@@ -29,12 +31,12 @@ function ProfileList() {
 
   return (
     <div>
-      <h2>Profiles</h2>
+ 
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {profiles.map(profile => (
           <li key={profile.id} style={{ marginBottom: '20px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
             {/* Wrap Avatar component in Link */}
-            <Link to={`/@${profile.displayName}`}>
+            <Link to={`/profile/${profile.id}`}>
               <Avatar src={profile.photoURL} alt={profile.displayName} sx={{ width: 100, height: 100, marginBottom: 2 }} />
             </Link>
             <div>

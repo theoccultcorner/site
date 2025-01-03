@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Avatar, TextField, Paper, Typography } from '@mui/material';
+import { Button, Avatar, TextField, Paper, Typography, Grid } from '@mui/material';
 import { auth } from '../firebaseConfig';
-import { db } from '../firebaseConfig'; // Import Firestore db instance
-import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Import updateDoc from firestore
+import { db } from '../firebaseConfig';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -19,7 +19,6 @@ const Profile = () => {
       if (user) {
         setDisplayName(user.displayName || '');
         setPhotoURL(user.photoURL || '');
-        // Fetch additional profile data from Firestore if available
         await fetchProfileData(user.uid);
       }
     });
@@ -34,7 +33,7 @@ const Profile = () => {
         const userData = docSnap.data();
         setBio(userData.bio || '');
         setWebsite(userData.website || '');
-        setProfileData(userData); // Set all profile data
+        setProfileData(userData);
       }
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -61,49 +60,60 @@ const Profile = () => {
   return (
     <Paper style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
       <Typography variant="h5" style={{ marginBottom: '20px' }}>Edit Profile</Typography>
-      <Avatar src={photoURL} alt={displayName} sx={{ width: 100, height: 100, marginBottom: 10 }} />
-      <TextField
-        label="Display Name"
-        value={displayName}
-        onChange={(e) => setDisplayName(e.target.value)}
-        fullWidth
-        style={{ marginBottom: 10 }}
-      />
-      <TextField
-        label="Profile Picture URL"
-        value={photoURL}
-        onChange={(e) => setPhotoURL(e.target.value)}
-        fullWidth
-        style={{ marginBottom: 10 }}
-      />
-      <TextField
-        label="Bio"
-        value={bio}
-        onChange={(e) => setBio(e.target.value)}
-        fullWidth
-        multiline
-        rows={3}
-        style={{ marginBottom: 10 }}
-      />
-      <TextField
-        label="Website"
-        value={website}
-        onChange={(e) => setWebsite(e.target.value)}
-        fullWidth
-        style={{ marginBottom: 10 }}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSaveProfile}
-        disabled={loading}
-      >
-        {loading ? 'Saving...' : 'Save Profile'}
-      </Button>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12} sm={4}>
+          <Avatar src={photoURL} alt={displayName} sx={{ width: 100, height: 100 }} />
+        </Grid>
+        <Grid item xs={12} sm={8}>
+          <TextField
+            label="Display Name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            fullWidth
+            style={{ marginBottom: 10 }}
+          />
+          <TextField
+            label="Profile Picture URL"
+            value={photoURL}
+            onChange={(e) => setPhotoURL(e.target.value)}
+            fullWidth
+            style={{ marginBottom: 10 }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Bio"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            fullWidth
+            multiline
+            rows={3}
+            style={{ marginBottom: 10 }}
+          />
+          <TextField
+            label="Website"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            fullWidth
+            style={{ marginBottom: 10 }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveProfile}
+            disabled={loading}
+            fullWidth
+          >
+            {loading ? 'Saving...' : 'Save Profile'}
+          </Button>
+        </Grid>
+      </Grid>
 
       {profileData && (
-        <div>
-          <Typography variant="h5" style={{ marginTop: '20px' }}>Profile Data</Typography>
+        <div style={{ marginTop: '20px' }}>
+          <Typography variant="h5">Profile Data</Typography>
           <Typography><strong>Email:</strong> {profileData.email}</Typography>
           {/* Display other profile attributes here */}
         </div>
