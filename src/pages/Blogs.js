@@ -156,15 +156,8 @@ const Blogs = () => {
             <Typography variant="subtitle2" style={styles.date}>
               {new Date(post.date).toLocaleString()}
             </Typography>
-<<<<<<< HEAD
             {user && <DeleteButton postId={post.id} />}
  
-=======
-            {user && user.uid === post.userId && (
-  <DeleteButton postId={post.id} />
-)}
-
->>>>>>> 3b672186bf7fc6c4041a7d83ce9bf38a2803f049
             <Divider style={{ margin: '10px 0' }} />
             {post.imageUrl && <img src={post.imageUrl} alt="Post" style={styles.image} />}
             <Typography style={styles.articleContent}>{post.content}</Typography>
