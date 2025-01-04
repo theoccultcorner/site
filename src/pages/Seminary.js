@@ -32,7 +32,7 @@ const Seminary = () => {
       <Toolbar>
         <Typography variant="h6" style={{ flexGrow: 1 }}>
           <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>
-            Gnostic Catholic Union Seminary
+            Seminary
           </Link>
         </Typography>
         <div>
