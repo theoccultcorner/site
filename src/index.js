@@ -12,6 +12,7 @@ import ProfileList from "./pages/ProfileList";
 import UserProfile from "./pages/UserProfile";
 import Meta from "./pages/Meta";
 import Formation from "./pages/Seminary/Formation";
+import Requirements from "./pages/Seminary/Requirements";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="Seminary*" element={<Seminary />} />
           <Route path="profiles" element={<ProfileList />} />
           <Route path="/seminary/formation" element={<Formation />} />
+          <Route path="/seminary/Requirements" element={<Requirements />} />
           <Route path="/profile/:displayName" element={<UserProfile />} />
           <Route path="meta" element={<Meta />} />
           <Route path="blogs" element={<Blogs />} />
