@@ -33,7 +33,7 @@ Gnostic Christian Theology differs greatly from Roman Catholicism and Eastern Or
     </p>
       <div style={styles.socialIcons}>
         <a href="https://www.facebook.com/groups/1683564482015355" target="_blank" rel="noopener noreferrer"><FaFacebook size={30} style={styles.icon} /></a>
-        <a href="https://discord.gg/Jq8tw8h2" target="_blank" rel="noopener noreferrer"><FaDiscord size={30} style={styles.icon} /></a>
+ 
         <a href="https://www.youtube.com/@TheGnosticCatholicUnion" target="_blank" rel="noopener noreferrer"><FaYoutube size={30} style={styles.icon} /></a>
  
       </div>
