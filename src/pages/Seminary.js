@@ -5,11 +5,10 @@ import Formation from './Formation';
 import Programs from './Programs';
 import Admissions from './Admissions';
 import Degrees from './Degrees';
-import Faculty from './Faculty';
+import Faculty from './Faculty.js';
 import Events from './Events';
 import Resources from './Resources';
-import Contact from './Contact';
-import FAQs from './FAQs';
+  
 import Apply from './Apply';
 import SeminaryHome from './SeminaryHome';
 
@@ -33,8 +32,7 @@ const Seminary = () => {
     { label: 'Faculty', path: '/faculty' },
     { label: 'Events', path: '/events' },
     { label: 'Resources', path: '/resources' },
-    { label: 'Contact', path: '/contact' },
-    { label: 'FAQs', path: '/faqs' },
+ 
     { label: 'Apply Now', path: '/apply' },
   ];
 
@@ -84,8 +82,7 @@ const Seminary = () => {
         <Route path="/faculty" element={<Faculty />} />
         <Route path="/events" element={<Events />} />
         <Route path="/resources" element={<Resources />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/faqs" element={<FAQs />} />
+        
         <Route path="/apply" element={<Apply />} />
       </Routes>
     </div>
