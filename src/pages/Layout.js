@@ -86,6 +86,11 @@ const Layout = () => {
     navigate('/blogs');
   };
 
+  const goToSeminary = () => {
+    setAnchorEl(null);
+    navigate('/seminary');
+  };
+
   const goToContact = () => {
     setAnchorEl(null);
     navigate('/contact');
@@ -96,7 +101,7 @@ const Layout = () => {
       <AppBar position="static" style={{ background: 'black' }}>
         <Toolbar>
           <Typography variant="h6" component={Link} to="/" style={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
-            TheGnosticChristian.Org
+            The Gnostic Union
           </Typography>
           {user ? (
             <div>
@@ -131,6 +136,7 @@ const Layout = () => {
               >
                 <MenuItem onClick={goToProfile}>Profile</MenuItem>
                 <MenuItem onClick={goToProfiles}>Community</MenuItem>
+                <MenuItem onClick={goToSeminary}>Seminary</MenuItem>
                 <MenuItem onClick={goToMeta}>Pleroma</MenuItem>
                 <MenuItem onClick={goToBlogs}>Blogs</MenuItem>
                 <MenuItem onClick={goToContact}>Contact</MenuItem>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFacebook, FaDiscord, FaYoutube } from 'react-icons/fa';
+import { FaFacebook, FaYoutube } from 'react-icons/fa';
 
 const Home = () => {
   return ( 
