@@ -107,6 +107,11 @@ const Layout = () => {
     navigate('/seminary/Requirements');
   };
 
+  const goToAbout= () => {
+    handleClose();
+    navigate('/About');
+  };
+
   const goToContact = () => {
     handleClose();
     navigate('/contact');
@@ -150,6 +155,7 @@ const Layout = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
+                <MenuItem onClick={goToAbout}>About</MenuItem>
                 <MenuItem onClick={goToProfile}>Profile</MenuItem>
                 <MenuItem onClick={goToProfiles}>Community</MenuItem>
                 <MenuItem onClick={handleSubMenu}>Seminary</MenuItem>
@@ -177,7 +183,7 @@ const Layout = () => {
                 <MenuItem onClick={goToSeminaryHome}>Seminary Home</MenuItem>
                 <MenuItem onClick={goToFormation}>Formation</MenuItem>
                 <MenuItem onClick={goToRequirements}>Requirements</MenuItem>
-                <MenuItem onClick={goToFoundations}>Formation</MenuItem>
+                <MenuItem onClick={goToFoundations}>Foundations</MenuItem>
                 {/* Add other Seminary options here */}
               </Menu>
             </div>

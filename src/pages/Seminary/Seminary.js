@@ -1,31 +1,40 @@
 import React from 'react';
- 
 
 const Seminary = () => {
   return (
- <section className="seminary-home-call">
-       <h1>  Training Leaders for the 21st Century</h1>
-      <p>
-     
-      <h3>Are you called to serve?</h3>
-The Gnostiç Catholic Union Seminary
-Stack of Books
-Are you called to serve?
+    <div className="seminary-container">
+      <header className="seminary-header">
+        <h1>Training Leaders for the 21st Century</h1>
+      </header>
 
-Today Independent Catholics of all ages are being called to a life of service and witness in the church. 
-The Gnostic Catholic Union Seminary is preparing students to answer that call.  
+      <section className="seminary-intro">
+        <h2>Are you called to serve?</h2>
+        <p>
+          The Gnostic Catholic Union Seminary is preparing students to answer that call. Today, Independent Catholics of
+          all ages are being called to a life of service and witness in the church.
+        </p>
+      </section>
 
-We, at the Gnostic Catholic Union Seminary, in addition to offering several certificate programs offer bachelor, master, and doctoral level degrees at very reasonable tuition. Education to help you build your ministry should be affordable and easily accessible.
+      <section className="seminary-programs">
+        <p>
+          We, at the Gnostic Catholic Union Seminary, offer several certificate programs as well as bachelor, master, and
+          doctoral-level degrees at very reasonable tuition. Education to help you build your ministry should be affordable
+          and easily accessible.
+        </p>
+      </section>
 
-We are pleased to announce our Degree by Dissertation / Thesis Program.  Although this model of learning can be done in a shorter amount of time compared to the traditional coursework method, it is by no means less taxing.  These programs are rigorous but just as rewarding as the result is a work of publishable quality and depth.
-      </p>
-    </section>
+      <section className="seminary-dissertation">
+        <h3>Degree by Dissertation / Thesis Program</h3>
+        <p>
+          We are pleased to announce our Degree by Dissertation / Thesis Program. Although this model of learning can be
+          completed in a shorter amount of time compared to the traditional coursework method, it is by no means less
+          rigorous. These programs are challenging but equally rewarding, as the result is a work of publishable quality and
+          depth.
+        </p>
+      </section>
+      <h3>Email: <a href="mailto:BishopJasonJones@TheGnosticCatholicUnion.org">BishopJasonJones@TheGnosticCatholicUnion.org</a></h3>
+    </div>
   );
 };
-
- 
- 
-
- 
 
 export default Seminary;

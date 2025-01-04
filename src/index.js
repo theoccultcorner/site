@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Blogs from "./pages/Blogs";
+import About from "./pages/About";
 import Seminary from "./pages/Seminary/Seminary";
 import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
@@ -13,6 +14,7 @@ import UserProfile from "./pages/UserProfile";
 import Meta from "./pages/Meta";
 import Formation from "./pages/Seminary/Formation";
 import Requirements from "./pages/Seminary/Requirements";
+import Foundations from "./pages/Seminary/Foundations";
 
 const App = () => {
   return (
@@ -20,11 +22,13 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="About" element={<About />} />
           <Route path="profile" element={<Profile />} />
           <Route path="Seminary*" element={<Seminary />} />
           <Route path="profiles" element={<ProfileList />} />
           <Route path="/seminary/formation" element={<Formation />} />
           <Route path="/seminary/Requirements" element={<Requirements />} />
+          <Route path="/seminary/Foundations" element={<Foundations />} />
           <Route path="/profile/:displayName" element={<UserProfile />} />
           <Route path="meta" element={<Meta />} />
           <Route path="blogs" element={<Blogs />} />
