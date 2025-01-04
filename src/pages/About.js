@@ -52,9 +52,7 @@ const About = () => {
 
   return (
     <div style={styles.container}>
-      <Typography variant="h3" style={styles.title}>
-        About Us
-      </Typography>
+     
       <Grid container spacing={3}>
         {sections.map((section, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
