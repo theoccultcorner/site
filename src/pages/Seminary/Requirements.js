@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@mui/material';
 
 const Requirements = () => {
   return (
@@ -45,7 +46,15 @@ const Requirements = () => {
         Bishop Jason Jones, G.S.J., S.T.L., M.S., DMin., Ed.D.<br />
         Rector and Academic Dean of The Gnostic Catholic Union Seminary
       </p>
-      <h3>Email: <a href="mailto:BishopJasonJones@TheGnosticCatholicUnion.org">BishopJasonJones@TheGnosticCatholicUnion.org</a></h3>
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          href="mailto:BishopJasonJones@TheGnosticCatholicUnion.org"
+        >
+          Contact Us
+        </Button>
+      </div>
     </div>
   );
 };

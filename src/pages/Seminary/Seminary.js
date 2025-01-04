@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@mui/material';
 
 const Seminary = () => {
   return (
@@ -32,7 +33,16 @@ const Seminary = () => {
           depth.
         </p>
       </section>
-      <h3>Email: <a href="mailto:BishopJasonJones@TheGnosticCatholicUnion.org">BishopJasonJones@TheGnosticCatholicUnion.org</a></h3>
+
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          href="mailto:BishopJasonJones@TheGnosticCatholicUnion.org"
+        >
+          Contact Us
+        </Button>
+      </div>
     </div>
   );
 };
