@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Avatar } from '@mui/material';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
+import Footer from './Footer'; // Import Footer component
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -66,55 +67,9 @@ const Layout = () => {
     setSubMenuEl(null);
   };
 
-  const goToProfile = () => {
+  const navigateTo = (path) => {
     handleClose();
-    navigate('/profile');
-  };
-
-  const goToMeta = () => {
-    handleClose();
-    navigate('/meta');
-  };
-
-  const goToProfiles = () => {
-    handleClose();
-    navigate('/profiles');
-  };
-
-  const goToBlogs = () => {
-    handleClose();
-    navigate('/blogs');
-  };
-
-  const goToSeminaryHome = () => {
-    handleClose();
-    navigate('/seminary');
-  };
-
-  const goToFormation = () => {
-    handleClose();
-    navigate('/seminary/formation');
-  };
-
-
-  const goToFoundations= () => {
-    handleClose();
-    navigate('/seminary/Foundations');
-  };
-
-  const goToRequirements= () => {
-    handleClose();
-    navigate('/seminary/Requirements');
-  };
-
-  const goToAbout= () => {
-    handleClose();
-    navigate('/About');
-  };
-
-  const goToContact = () => {
-    handleClose();
-    navigate('/contact');
+    navigate(path);
   };
 
   return (
@@ -155,17 +110,16 @@ const Layout = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={goToAbout}>About</MenuItem>
-                <MenuItem onClick={goToProfile}>Profile</MenuItem>
-                <MenuItem onClick={goToProfiles}>Community</MenuItem>
+                <MenuItem onClick={() => navigateTo('/about')}>About</MenuItem>
+                <MenuItem onClick={() => navigateTo('/profile')}>Profile</MenuItem>
+                <MenuItem onClick={() => navigateTo('/profiles')}>Community</MenuItem>
                 <MenuItem onClick={handleSubMenu}>Seminary</MenuItem>
-                <MenuItem onClick={goToMeta}>Pleroma</MenuItem>
-                <MenuItem onClick={goToBlogs}>Blogs</MenuItem>
-                <MenuItem onClick={goToContact}>Contact</MenuItem>
+                <MenuItem onClick={() => navigateTo('/meta')}>Pleroma</MenuItem>
+                <MenuItem onClick={() => navigateTo('/blogs')}>Blogs</MenuItem>
+                <MenuItem onClick={() => navigateTo('/contact')}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
 
-              {/* Seminary Sub-Menu */}
               <Menu
                 id="sub-menu"
                 anchorEl={subMenuEl}
@@ -180,11 +134,10 @@ const Layout = () => {
                   horizontal: 'right',
                 }}
               >
-                <MenuItem onClick={goToSeminaryHome}>Seminary Home</MenuItem>
-                <MenuItem onClick={goToFormation}>Formation</MenuItem>
-                <MenuItem onClick={goToRequirements}>Requirements</MenuItem>
-                <MenuItem onClick={goToFoundations}>Foundations</MenuItem>
-                {/* Add other Seminary options here */}
+                <MenuItem onClick={() => navigateTo('/seminary')}>Seminary Home</MenuItem>
+                <MenuItem onClick={() => navigateTo('/seminary/formation')}>Formation</MenuItem>
+                <MenuItem onClick={() => navigateTo('/seminary/requirements')}>Requirements</MenuItem>
+                <MenuItem onClick={() => navigateTo('/seminary/foundations')}>Foundations</MenuItem>
               </Menu>
             </div>
           ) : (
@@ -196,6 +149,7 @@ const Layout = () => {
       </AppBar>
 
       <Outlet />
+      <Footer />
     </>
   );
 };
