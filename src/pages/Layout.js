@@ -96,6 +96,12 @@ const Layout = () => {
     navigate('/seminary/formation');
   };
 
+
+  const goToFoundations= () => {
+    handleClose();
+    navigate('/seminary/Foundations');
+  };
+
   const goToRequirements= () => {
     handleClose();
     navigate('/seminary/Requirements');
@@ -171,6 +177,7 @@ const Layout = () => {
                 <MenuItem onClick={goToSeminaryHome}>Seminary Home</MenuItem>
                 <MenuItem onClick={goToFormation}>Formation</MenuItem>
                 <MenuItem onClick={goToRequirements}>Requirements</MenuItem>
+                <MenuItem onClick={goToFoundations}>Formation</MenuItem>
                 {/* Add other Seminary options here */}
               </Menu>
             </div>
