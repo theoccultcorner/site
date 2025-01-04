@@ -3,12 +3,13 @@ import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Avatar
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore'; // Import Firestore functions
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 const Layout = () => {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [subMenuEl, setSubMenuEl] = useState(null); // For Seminary sub-menu
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,30 +24,24 @@ const Layout = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
-  
-      // Check if user profile already exists in Firestore
+
       const userRef = doc(db, 'profiles', result.user.uid);
       const docSnap = await getDoc(userRef);
       if (!docSnap.exists()) {
-        // If profile doesn't exist, create a new one with sample data
         await setDoc(userRef, {
           email: result.user.email,
           displayName: result.user.displayName,
           photoURL: result.user.photoURL,
-          // Assign temporary sample data
           bio: 'This is a sample bio',
           website: 'https://example.com',
         });
       }
-  
-      // Redirect to profile page
+
       navigate('/profile');
-  
     } catch (error) {
       console.error('Error occurred during login:', error);
     }
   };
-  
 
   const handleLogout = async () => {
     try {
@@ -62,37 +57,47 @@ const Layout = () => {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleSubMenu = (event) => {
+    setSubMenuEl(event.currentTarget);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
+    setSubMenuEl(null);
   };
 
   const goToProfile = () => {
-    setAnchorEl(null);
+    handleClose();
     navigate('/profile');
   };
 
   const goToMeta = () => {
-    setAnchorEl(null);
+    handleClose();
     navigate('/meta');
   };
 
   const goToProfiles = () => {
-    setAnchorEl(null);
+    handleClose();
     navigate('/profiles');
   };
 
   const goToBlogs = () => {
-    setAnchorEl(null);
+    handleClose();
     navigate('/blogs');
   };
 
-  const goToSeminary = () => {
-    setAnchorEl(null);
+  const goToSeminaryHome = () => {
+    handleClose();
     navigate('/seminary');
   };
 
+  const goToFormation = () => {
+    handleClose();
+    navigate('/seminary/formation');
+  };
+
   const goToContact = () => {
-    setAnchorEl(null);
+    handleClose();
     navigate('/contact');
   };
 
@@ -136,15 +141,37 @@ const Layout = () => {
               >
                 <MenuItem onClick={goToProfile}>Profile</MenuItem>
                 <MenuItem onClick={goToProfiles}>Community</MenuItem>
-                <MenuItem onClick={goToSeminary}>Seminary</MenuItem>
+                <MenuItem onClick={handleSubMenu}>Seminary</MenuItem>
                 <MenuItem onClick={goToMeta}>Pleroma</MenuItem>
                 <MenuItem onClick={goToBlogs}>Blogs</MenuItem>
                 <MenuItem onClick={goToContact}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
+
+              {/* Seminary Sub-Menu */}
+              <Menu
+                id="sub-menu"
+                anchorEl={subMenuEl}
+                open={Boolean(subMenuEl)}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+              >
+                <MenuItem onClick={goToSeminaryHome}>Seminary Home</MenuItem>
+                <MenuItem onClick={goToFormation}>Formation</MenuItem>
+                {/* Add other Seminary options here */}
+              </Menu>
             </div>
           ) : (
-            <Button color="inherit" onClick={handleLogin}>Login</Button>
+            <Button color="inherit" onClick={handleLogin}>
+              Login
+            </Button>
           )}
         </Toolbar>
       </AppBar>

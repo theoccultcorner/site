@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { getDatabase, ref, set, onValue, get } from 'firebase/database';
 
@@ -9,28 +9,7 @@ const Likes = ({ postId, user }) => {
   const [open, setOpen] = useState(false);
   const [userNames, setUserNames] = useState({});
 
-  useEffect(() => {
-    if (!user) return;
-    const db = getDatabase();
-    const likesRef = ref(db, `blogPosts/${postId}/likes`);
-    onValue(likesRef, (snapshot) => {
-      const likes = snapshot.val();
-      if (likes) {
-        setLikesCount(Object.keys(likes).length);
-        setLiked(user.uid in likes);
-        setLikers(Object.keys(likes));
-        setUserNames({}); // Reset userNames state
-        fetchUserNames(Object.keys(likes)); // Fetch user names
-      } else {
-        setLikesCount(0);
-        setLiked(false);
-        setLikers([]);
-        setUserNames({});
-      }
-    });
-  }, [postId, user]);
-
-  const fetchUserNames = async (userIds) => {
+  const fetchUserNames = useCallback(async (userIds) => {
     const db = getDatabase();
     const promises = userIds.map(async (userId) => {
       if (userId === user.uid) {
@@ -44,7 +23,29 @@ const Likes = ({ postId, user }) => {
       const userNamesObj = results.reduce((acc, result) => ({ ...acc, ...result }), {});
       setUserNames(userNamesObj);
     });
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const db = getDatabase();
+    const likesRef = ref(db, `blogPosts/${postId}/likes`);
+    onValue(likesRef, (snapshot) => {
+      const likes = snapshot.val();
+      if (likes) {
+        const likerIds = Object.keys(likes);
+        setLikesCount(likerIds.length);
+        setLiked(user.uid in likes);
+        setLikers(likerIds);
+        setUserNames({});
+        fetchUserNames(likerIds);
+      } else {
+        setLikesCount(0);
+        setLiked(false);
+        setLikers([]);
+        setUserNames({});
+      }
+    });
+  }, [postId, user, fetchUserNames]);
 
   const handleLike = async () => {
     if (!user) return;
@@ -59,26 +60,6 @@ const Likes = ({ postId, user }) => {
       await set(likesRef, null);
       setLiked(false);
     }
-
-    refreshLikesCount();
-  };
-
-  const refreshLikesCount = () => {
-    const db = getDatabase();
-    const likesRef = ref(db, `blogPosts/${postId}/likes`);
-    onValue(likesRef, (snapshot) => {
-      const likes = snapshot.val();
-      if (likes) {
-        setLikesCount(Object.keys(likes).length);
-        setLikers(Object.keys(likes));
-        setUserNames({});
-        fetchUserNames(Object.keys(likes));
-      } else {
-        setLikesCount(0);
-        setLikers([]);
-        setUserNames({});
-      }
-    });
   };
 
   const handleClose = () => {
@@ -99,7 +80,7 @@ const Likes = ({ postId, user }) => {
           <List>
             {likers.map((likerId) => (
               <ListItem key={likerId}>
-                <ListItemText primary={userNames[likerId]} />
+                <ListItemText primary={userNames[likerId] || 'Loading...'} />
               </ListItem>
             ))}
           </List>

@@ -4,7 +4,7 @@ const Formation = () => {
   return (
     <div className="formation-container">
       <header className="formation-header">
-        <h1>Formation at</h1>
+     
         <h2>The Seminary of the Gnostic Catholic Union</h2>
       </header>
 

@@ -156,8 +156,8 @@ const Blogs = () => {
             <Typography variant="subtitle2" style={styles.date}>
               {new Date(post.date).toLocaleString()}
             </Typography>
-            {user && <DeleteButton postId={post.id} />}
- 
+            {user && <DeleteButton postId={post.id} onDelete={handleDelete} />}
+
             <Divider style={{ margin: '10px 0' }} />
             {post.imageUrl && <img src={post.imageUrl} alt="Post" style={styles.image} />}
             <Typography style={styles.articleContent}>{post.content}</Typography>

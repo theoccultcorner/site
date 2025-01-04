@@ -1,14 +1,7 @@
- 
-import './App.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App'; // Use the unified App component
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-      
-      </header>
-    </div>
-  );
-}
-
-export default App;
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
