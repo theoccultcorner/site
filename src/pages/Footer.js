@@ -26,13 +26,7 @@ const Footer = () => {
         © {new Date().getFullYear()} The Gnostic Union. All Rights Reserved.
       </Typography>
       <Typography variant="body2">
-        <Link href="/terms" color="inherit" underline="hover">
-          Terms of Service
-        </Link>{' '}
-        |{' '}
-        <Link href="/privacy" color="inherit" underline="hover">
-          Privacy Policy
-        </Link>
+        
       </Typography>
     </Box>
   );
