@@ -56,8 +56,17 @@ function UserProfile() {
           <Typography variant="h5" gutterBottom>
             {profile.displayName || 'No Display Name'}
           </Typography>
-          <Typography variant="body1" color="textSecondary" gutterBottom>
-            {profile.email || 'No Email Available'}
+          <Typography variant="body1" gutterBottom>
+            {profile.email ? (
+              <a
+                href={`mailto:${profile.email}`}
+                style={{ color: '#1976d2', textDecoration: 'none' }}
+              >
+                {profile.email}
+              </a>
+            ) : (
+              'No Email Available'
+            )}
           </Typography>
           <Typography variant="body1" gutterBottom>
             {profile.bio || 'No Bio Available'}
