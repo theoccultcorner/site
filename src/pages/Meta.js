@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -23,6 +23,7 @@ const Meta = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [userProfiles, setUserProfiles] = useState({});
+  const chatBoxRef = useRef(null); // Reference for the chatbox
 
   useEffect(() => {
     const fetchUserData = async (user) => {
@@ -46,12 +47,10 @@ const Meta = () => {
       onValue(messagesRef, (snapshot) => {
         const data = snapshot.val();
         const loadedMessages = data
-          ? Object.entries(data)
-              .map(([key, value]) => ({
-                id: key,
-                ...value,
-              }))
-              .filter((msg) => msg.uid) // Exclude messages without a uid
+          ? Object.entries(data).map(([key, value]) => ({
+              id: key,
+              ...value,
+            }))
           : [];
         setMessages(loadedMessages);
         fetchProfiles(loadedMessages);
@@ -88,6 +87,13 @@ const Meta = () => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    // Scroll to the newest message in the chatbox
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSend = () => {
     if (!currentUser || input.trim() === '') return;
@@ -130,6 +136,11 @@ const Meta = () => {
     }
   };
 
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+  };
+
   return (
     <Box
       sx={{
@@ -146,6 +157,7 @@ const Meta = () => {
         Διαλεκτικὸς Χῶρος (Dialektikós Chōros)
       </Typography>
       <Paper
+        ref={chatBoxRef} // Attach the ref to the chatbox
         sx={{
           width: '100%',
           maxWidth: 600,
@@ -169,9 +181,14 @@ const Meta = () => {
               </ListItemAvatar>
               <ListItemText
                 primary={
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {userProfiles[message.uid]?.name || 'Anonymous'}
-                  </Typography>
+                  <>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {userProfiles[message.uid]?.name || 'Anonymous'}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {formatTimestamp(message.timestamp)}
+                    </Typography>
+                  </>
                 }
                 secondary={message.text}
               />
