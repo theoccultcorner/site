@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig'; // Import Firestore database instance
+import { db } from '../firebaseConfig';
 import { Avatar, Card, CardContent, Typography } from '@mui/material';
 
 function UserProfile() {
@@ -12,54 +12,70 @@ function UserProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Construct profile reference
         const profileRef = doc(db, 'profiles', displayName);
         const profileSnap = await getDoc(profileRef);
 
         if (profileSnap.exists()) {
-          // Set the profile data if it exists
           setProfile({ id: profileSnap.id, ...profileSnap.data() });
         } else {
           console.log('No such document!');
-          // If profile does not exist, create a new one with initial data
           setProfile({ id: profileRef.id, displayName, email: '', bio: '', website: '' });
         }
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching user profile:', error); // Log any errors
+        console.error('Error fetching user profile:', error);
         setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [displayName]); // Re-run effect when displayName changes
+  }, [displayName]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Typography variant="h6" align="center" style={{ marginTop: '20px' }}>Loading...</Typography>;
   }
 
   if (!profile) {
-    return <div>Profile not found.</div>;
+    return <Typography variant="h6" align="center" style={{ marginTop: '20px' }}>Profile not found.</Typography>;
   }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
-      <Card sx={{ maxWidth: 600 }}>
-        <CardContent style={{ textAlign: 'center' }}>
-          <Avatar src={profile.photoURL} alt={profile.displayName} sx={{ width: 100, height: 100, marginBottom: 2 }} />
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px', padding: '20px' }}>
+      <Card sx={{ maxWidth: 600, padding: '20px', textAlign: 'center' }}>
+        <CardContent>
+          <Avatar
+            src={profile.photoURL}
+            alt={profile.displayName}
+            sx={{
+              width: 120,
+              height: 120,
+              margin: '0 auto 20px auto',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            }}
+          />
           <Typography variant="h5" gutterBottom>
-            {profile.displayName}
+            {profile.displayName || 'No Display Name'}
           </Typography>
           <Typography variant="body1" color="textSecondary" gutterBottom>
-            {profile.email}
+            {profile.email || 'No Email Available'}
           </Typography>
           <Typography variant="body1" gutterBottom>
-            {profile.bio}
+            {profile.bio || 'No Bio Available'}
           </Typography>
           <Typography variant="body1" color="textSecondary" gutterBottom>
-            {profile.website}
+            {profile.website ? (
+              <a
+                href={profile.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#1976d2', textDecoration: 'none' }}
+              >
+                {profile.website}
+              </a>
+            ) : (
+              'No Website Available'
+            )}
           </Typography>
-          {/* Add more profile details here */}
         </CardContent>
       </Card>
     </div>
