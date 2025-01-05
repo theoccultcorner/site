@@ -44,11 +44,11 @@ const Blogs = () => {
   }, []);
 
   const handleUpload = async () => {
-    if (!imageFile) return null; // No file selected
+    if (!imageFile) return null;
     const storage = getStorage();
     const imageRef = storageRef(storage, `images/${imageFile.name}`);
     await uploadBytes(imageRef, imageFile);
-    return getDownloadURL(imageRef); // Get download URL after upload
+    return getDownloadURL(imageRef);
   };
 
   const handlePost = async () => {
@@ -107,6 +107,9 @@ const Blogs = () => {
     <div style={styles.container}>
       {user && (
         <Paper style={styles.postForm}>
+          <Typography variant="h5" style={styles.formTitle}>
+            Create a New Post
+          </Typography>
           <TextField
             fullWidth
             variant="outlined"
@@ -136,7 +139,7 @@ const Blogs = () => {
             onChange={(e) => setPostContent(e.target.value)}
             style={styles.input}
           />
-          <Button onClick={handlePost} variant="contained" color="primary">
+          <Button onClick={handlePost} variant="contained" color="primary" fullWidth>
             {editingPostId ? 'Update Post' : 'Post'}
           </Button>
         </Paper>
@@ -147,17 +150,15 @@ const Blogs = () => {
             <Typography variant="h5" style={styles.articleTitle}>
               {post.title}
             </Typography>
-            <Typography variant="subtitle1" style={styles.author}>
-              {user && user.photoURL && (
-                <Avatar src={user.photoURL} alt={user.displayName} style={styles.avatar} />
-              )}
-              {post.author}
-            </Typography>
+            <div style={styles.authorSection}>
+              <Avatar src={user?.photoURL} alt={user?.displayName} style={styles.avatar} />
+              <Typography variant="subtitle1" style={styles.authorName}>
+                {post.author}
+              </Typography>
+            </div>
             <Typography variant="subtitle2" style={styles.date}>
               {new Date(post.date).toLocaleString()}
             </Typography>
-            {user && <DeleteButton postId={post.id} onDelete={handleDelete} />}
-
             <Divider style={{ margin: '10px 0' }} />
             {post.imageUrl && <img src={post.imageUrl} alt="Post" style={styles.image} />}
             <Typography style={styles.articleContent}>{post.content}</Typography>
@@ -175,7 +176,7 @@ const Blogs = () => {
               onChange={(e) => setCommentText(e.target.value)}
               style={styles.input}
             />
-            <Button onClick={() => handleComment(post.id)} variant="contained" color="primary">
+            <Button onClick={() => handleComment(post.id)} variant="contained" color="primary" style={styles.commentButton}>
               Comment
             </Button>
             <Likes postId={post.id} user={user} />
@@ -194,6 +195,13 @@ const styles = {
   postForm: {
     padding: '20px',
     marginBottom: '20px',
+    background: '#f9f9f9',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    borderRadius: '8px',
+  },
+  formTitle: {
+    marginBottom: '15px',
+    fontWeight: 'bold',
   },
   input: {
     marginBottom: '20px',
@@ -209,19 +217,23 @@ const styles = {
   article: {
     padding: '20px',
     background: '#fff',
-    boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)',
     borderRadius: '8px',
   },
   articleTitle: {
     marginBottom: '10px',
+    fontWeight: 'bold',
   },
-  author: {
+  authorSection: {
     display: 'flex',
     alignItems: 'center',
-    marginBottom: '5px',
+    marginBottom: '10px',
   },
   avatar: {
     marginRight: '10px',
+  },
+  authorName: {
+    fontWeight: 'bold',
   },
   date: {
     marginBottom: '10px',
@@ -234,6 +246,9 @@ const styles = {
   },
   articleContent: {
     marginBottom: '10px',
+  },
+  commentButton: {
+    marginTop: '10px',
   },
 };
 
