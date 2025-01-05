@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Avatar, TextField, Paper, Typography, Divider, Card, CardContent, CardMedia } from '@mui/material';
+import { Button, TextField, Paper, Typography, Card, CardContent, CardMedia, Modal, Box } from '@mui/material';
 import { auth } from '../firebaseConfig';
-import { getDatabase, ref, onValue, push, update } from 'firebase/database';
+import { getDatabase, ref, onValue, push } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import Comments from './Comments';
-import Likes from './Likes';
 
 const Blogs = () => {
   const [user, setUser] = useState(null);
   const [blogPosts, setBlogPosts] = useState([]);
-  const [commentText, setCommentText] = useState('');
   const [postTitle, setPostTitle] = useState('');
   const [postContent, setPostContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
-  const [editingPostId, setEditingPostId] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -67,32 +65,23 @@ const Blogs = () => {
       if (imageUrl) {
         postData.imageUrl = imageUrl;
       }
-      if (editingPostId) {
-        await update(ref(db, `blogPosts/${editingPostId}`), postData);
-        setEditingPostId(null);
-      } else {
-        await push(ref(db, 'blogPosts'), postData);
-      }
+      await push(ref(db, 'blogPosts'), postData);
       setPostTitle('');
       setPostContent('');
-      setCommentText('');
       setImageFile(null);
     } catch (error) {
       console.error('Error uploading image:', error);
     }
   };
 
-  const handleComment = async (postId) => {
-    if (!commentText.trim()) return;
-    const db = getDatabase();
-    const commentsRef = ref(db, `blogPosts/${postId}/comments`);
-    await push(commentsRef, {
-      text: commentText.trim(),
-      userId: user.uid,
-      userName: user.displayName,
-      timestamp: new Date().toISOString(),
-    });
-    setCommentText('');
+  const openModal = (post) => {
+    setSelectedPost(post);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedPost(null);
   };
 
   return (
@@ -132,85 +121,68 @@ const Blogs = () => {
             style={styles.input}
           />
           <Button onClick={handlePost} variant="contained" color="primary" fullWidth>
-            {editingPostId ? 'Update Post' : 'Post'}
+            Post
           </Button>
         </Paper>
       )}
       <div style={styles.articles}>
         {blogPosts.map((post) => (
-          <Card key={post.id} style={styles.card}>
-            {post.imageUrl && (
-              <CardMedia
-                component="img"
-                height="200"
-                image={post.imageUrl}
-                alt="Post Image"
-                style={styles.cardImage}
-              />
-            )}
+          <Card key={post.id} style={styles.articleCard}>
+            <CardMedia
+              component="img"
+              height="140"
+              image={post.imageUrl}
+              alt="Post image"
+              style={styles.articleImage}
+            />
             <CardContent>
-              <Typography variant="h5" style={styles.articleTitle}>
-                {post.title}
-              </Typography>
+              <Typography variant="h5">{post.title}</Typography>
               <Typography variant="subtitle1" style={styles.author}>
                 {post.author}
               </Typography>
               <Typography variant="subtitle2" style={styles.date}>
                 {new Date(post.date).toLocaleString()}
               </Typography>
-              <Divider style={{ margin: '10px 0' }} />
-              <Typography style={styles.articleContent}>{post.content}</Typography>
-              <Comments
-                postId={post.id}
-                user={user}
-                comments={post.comments}
-                allowDelete={user && user.uid === post.userId}
-              />
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Write a comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                style={styles.input}
-              />
-              <Button
-                onClick={() => handleComment(post.id)}
-                variant="contained"
-                color="primary"
-                style={styles.commentButton}
-              >
-                Comment
+              <Button onClick={() => openModal(post)} variant="contained" style={styles.readMoreButton}>
+                Read More
               </Button>
-              <Likes postId={post.id} user={user} />
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <Modal open={modalOpen} onClose={closeModal}>
+        <Box style={styles.modal}>
+          {selectedPost && (
+            <>
+              <Typography variant="h4" style={styles.modalTitle}>
+                {selectedPost.title}
+              </Typography>
+              <img src={selectedPost.imageUrl} alt="Post" style={styles.modalImage} />
+              <Typography variant="subtitle1" style={styles.modalAuthor}>
+                By {selectedPost.author} on {new Date(selectedPost.date).toLocaleString()}
+              </Typography>
+              <Typography style={styles.modalContent}>{selectedPost.content}</Typography>
+            </>
+          )}
+        </Box>
+      </Modal>
     </div>
   );
 };
 
 const styles = {
   container: {
-    textAlign: 'center',
     padding: '20px',
+    textAlign: 'center',
   },
   postForm: {
     padding: '20px',
     marginBottom: '20px',
     background: '#f9f9f9',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     borderRadius: '8px',
   },
-  formTitle: {
-    marginBottom: '15px',
-    fontWeight: 'bold',
-  },
   input: {
-    marginBottom: '20px',
-  },
-  uploadButton: {
     marginBottom: '20px',
   },
   articles: {
@@ -218,32 +190,38 @@ const styles = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
     gap: '20px',
   },
-  card: {
-    maxWidth: 400,
-    margin: '0 auto',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+  articleCard: {
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     borderRadius: '8px',
   },
-  cardImage: {
-    objectFit: 'cover',
+  modal: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90%',
+    maxHeight: '80%',
+    overflowY: 'auto',
+    backgroundColor: 'white',
+    border: '2px solid #000',
+    borderRadius: '8px',
+    padding: '20px',
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
   },
-  articleTitle: {
-    marginBottom: '10px',
-    fontWeight: 'bold',
+  modalTitle: {
+    marginBottom: '20px',
   },
-  author: {
-    marginBottom: '5px',
-    fontWeight: 'bold',
+  modalImage: {
+    width: '100%',
+    marginBottom: '20px',
+    borderRadius: '8px',
   },
-  date: {
+  modalAuthor: {
     marginBottom: '10px',
     color: '#666',
   },
-  articleContent: {
-    marginBottom: '10px',
-  },
-  commentButton: {
-    marginTop: '10px',
+  modalContent: {
+    lineHeight: '1.6',
   },
 };
 

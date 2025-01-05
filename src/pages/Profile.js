@@ -3,6 +3,7 @@ import { Button, Avatar, TextField, Paper, Typography, Grid, Box } from '@mui/ma
 import { auth } from '../firebaseConfig';
 import { db } from '../firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import Blogs from './Blogs'; // Import the Blogs component
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -125,6 +126,13 @@ const Profile = () => {
           </Typography>
         </Box>
       )}
+
+      <Box style={styles.blogSection}>
+        <Typography variant="h6" style={styles.blogTitle}>
+          User Blogs
+        </Typography>
+        <Blogs /> {/* Render the Blogs component here */}
+      </Box>
     </Paper>
   );
 };
@@ -161,6 +169,14 @@ const styles = {
     backgroundColor: '#f9f9f9',
     borderRadius: '8px',
     textAlign: 'center',
+  },
+  blogSection: {
+    marginTop: '40px',
+  },
+  blogTitle: {
+    marginBottom: '20px',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 };
 

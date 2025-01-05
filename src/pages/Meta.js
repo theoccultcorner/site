@@ -1,51 +1,208 @@
-import React, { useState } from 'react';
-import { Engine, Scene } from 'react-babylonjs';
-import { Vector3, Color3 } from '@babylonjs/core'; // Import Color3 directly
-import '@babylonjs/core/Helpers/sceneHelpers';
-
-const MicrophoneButton = ({ position, onClick, isListening }) => {
-  return (
-    <box
-      name="microphoneButton"
-      position={position}
-      height={0.5}
-      width={0.5}
-      depth={0.1}
-      onClick={onClick}
-    >
-      {/* Material will be added here */}
-    </box>
-  );
-};
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemAvatar,
+  Avatar,
+  ListItemText,
+  Paper,
+  IconButton,
+} from '@mui/material';
+import { auth, db } from '../firebaseConfig';
+import { getDatabase, ref, push, onValue, update, remove } from 'firebase/database';
+import { doc, getDoc } from 'firebase/firestore';
+import { Edit, Delete } from '@mui/icons-material';
 
 const Meta = () => {
-  const [isListening, setIsListening] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [userProfiles, setUserProfiles] = useState({});
 
-  const toggleListening = () => {
-    setIsListening(!isListening);
+  useEffect(() => {
+    const fetchUserData = async (user) => {
+      if (user) {
+        const userRef = doc(db, 'profiles', user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          setCurrentUser({
+            uid: user.uid,
+            name: userSnap.data().displayName || 'Anonymous',
+            avatar: userSnap.data().photoURL || 'https://via.placeholder.com/50',
+          });
+        }
+      }
+    };
+
+    const fetchMessages = () => {
+      const db = getDatabase();
+      const messagesRef = ref(db, 'messages');
+      onValue(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        const loadedMessages = data
+          ? Object.entries(data)
+              .map(([key, value]) => ({
+                id: key,
+                ...value,
+              }))
+              .filter((msg) => msg.uid) // Exclude messages without a uid
+          : [];
+        setMessages(loadedMessages);
+        fetchProfiles(loadedMessages);
+      });
+    };
+
+    const fetchProfiles = async (loadedMessages) => {
+      const profileRefs = Array.from(new Set(loadedMessages.map((msg) => msg.uid)));
+      const profiles = {};
+      await Promise.all(
+        profileRefs.map(async (uid) => {
+          try {
+            const userRef = doc(db, 'profiles', uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              profiles[uid] = {
+                name: userSnap.data().displayName || 'Anonymous',
+                avatar: userSnap.data().photoURL || 'https://via.placeholder.com/50',
+              };
+            }
+          } catch (error) {
+            console.error(`Error fetching profile for uid: ${uid}`, error);
+          }
+        })
+      );
+      setUserProfiles(profiles);
+    };
+
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      fetchUserData(user);
+    });
+
+    fetchMessages();
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSend = () => {
+    if (!currentUser || input.trim() === '') return;
+
+    const db = getDatabase();
+    const messagesRef = ref(db, 'messages');
+
+    if (editingMessageId) {
+      const messageRef = ref(db, `messages/${editingMessageId}`);
+      update(messageRef, { text: input }).then(() => {
+        setEditingMessageId(null);
+        setInput('');
+      });
+    } else {
+      push(messagesRef, {
+        text: input,
+        sender: currentUser.name,
+        avatar: currentUser.avatar,
+        uid: currentUser.uid,
+        timestamp: Date.now(),
+      });
+      setInput('');
+    }
+  };
+
+  const handleEdit = (message) => {
+    setInput(message.text);
+    setEditingMessageId(message.id);
+  };
+
+  const handleDelete = (messageId) => {
+    const db = getDatabase();
+    const messageRef = ref(db, `messages/${messageId}`);
+    remove(messageRef);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSend();
+    }
   };
 
   return (
-    <Engine canvasId="babylonJS">
-      <Scene clearColor={Color3.FromHexString('#CCCCCC')}> {/* Use Color3 directly */}
-        {/* Microphone Button */}
-        <MicrophoneButton
-          position={new Vector3(0, 2, -3)}
-          onClick={toggleListening}
-          isListening={isListening}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        backgroundColor: '#f5f5f5',
+        padding: '20px',
+      }}
+    >
+      <Typography variant="h4" gutterBottom>
+        Διαλεκτικὸς Χῶρος (Dialektikós Chōros)
+      </Typography>
+      <Paper
+        sx={{
+          width: '100%',
+          maxWidth: 600,
+          height: 500,
+          overflowY: 'auto',
+          backgroundColor: '#ffffff',
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          padding: '10px',
+          marginBottom: '20px',
+        }}
+      >
+        <List>
+          {messages.map((message) => (
+            <ListItem key={message.id} sx={{ alignItems: 'flex-start' }}>
+              <ListItemAvatar>
+                <Avatar
+                  src={userProfiles[message.uid]?.avatar || 'https://via.placeholder.com/50'}
+                  alt={userProfiles[message.uid]?.name || 'User'}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {userProfiles[message.uid]?.name || 'Anonymous'}
+                  </Typography>
+                }
+                secondary={message.text}
+              />
+              {currentUser && currentUser.uid === message.uid && (
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <IconButton onClick={() => handleEdit(message)}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(message.id)}>
+                    <Delete />
+                  </IconButton>
+                </Box>
+              )}
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+      <Box sx={{ display: 'flex', gap: '10px', width: '100%', maxWidth: 600 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="Type your message"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
-
-        {/* Ground */}
-        <ground name="ground" width={50} height={50} subdivisions={2} />
-
-        {/* Sky */}
-        <hemisphericLight
-          name="light"
-          direction={Vector3.Up()}
-          intensity={0.7}
-        />
-      </Scene>
-    </Engine>
+        <Button variant="contained" color="primary" onClick={handleSend}>
+          {editingMessageId ? 'Update' : 'Send'}
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

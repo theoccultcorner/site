@@ -114,7 +114,7 @@ const Layout = () => {
                 <MenuItem onClick={() => navigateTo('/profile')}>Profile</MenuItem>
                 <MenuItem onClick={() => navigateTo('/profiles')}>Community</MenuItem>
                 <MenuItem onClick={handleSubMenu}>Seminary</MenuItem>
-                <MenuItem onClick={() => navigateTo('/meta')}>Pleroma</MenuItem>
+                <MenuItem onClick={() => navigateTo('/meta')}>Διαλεκτικὸς Χῶρος</MenuItem>
                 <MenuItem onClick={() => navigateTo('/blogs')}>Blogs</MenuItem>
                 <MenuItem onClick={() => navigateTo('/contact')}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
