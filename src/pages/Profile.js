@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Avatar, TextField, Paper, Typography, Grid } from '@mui/material';
+import { Button, Avatar, TextField, Paper, Typography, Grid, Box } from '@mui/material';
 import { auth } from '../firebaseConfig';
 import { db } from '../firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -48,7 +48,7 @@ const Profile = () => {
         displayName: displayName.trim(),
         photoURL: photoURL.trim(),
         bio: bio.trim(),
-        website: website.trim()
+        website: website.trim(),
       });
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -58,26 +58,30 @@ const Profile = () => {
   };
 
   return (
-    <Paper style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
-      <Typography variant="h5" style={{ marginBottom: '20px' }}>Edit Profile</Typography>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} sm={4}>
-          <Avatar src={photoURL} alt={displayName} sx={{ width: 100, height: 100 }} />
-        </Grid>
-        <Grid item xs={12} sm={8}>
+    <Paper style={styles.paper}>
+      <Typography variant="h5" style={styles.title}>
+        Edit Profile
+      </Typography>
+      <Box style={styles.avatarBox}>
+        <Avatar src={photoURL} alt={displayName} style={styles.avatar} />
+      </Box>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
           <TextField
             label="Display Name"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             fullWidth
-            style={{ marginBottom: 10 }}
+            style={styles.input}
           />
+        </Grid>
+        <Grid item xs={12}>
           <TextField
             label="Profile Picture URL"
             value={photoURL}
             onChange={(e) => setPhotoURL(e.target.value)}
             fullWidth
-            style={{ marginBottom: 10 }}
+            style={styles.input}
           />
         </Grid>
         <Grid item xs={12}>
@@ -88,14 +92,16 @@ const Profile = () => {
             fullWidth
             multiline
             rows={3}
-            style={{ marginBottom: 10 }}
+            style={styles.input}
           />
+        </Grid>
+        <Grid item xs={12}>
           <TextField
             label="Website"
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
             fullWidth
-            style={{ marginBottom: 10 }}
+            style={styles.input}
           />
         </Grid>
         <Grid item xs={12}>
@@ -112,14 +118,50 @@ const Profile = () => {
       </Grid>
 
       {profileData && (
-        <div style={{ marginTop: '20px' }}>
-          <Typography variant="h5">Profile Data</Typography>
-          <Typography><strong>Email:</strong> {profileData.email}</Typography>
-          {/* Display other profile attributes here */}
-        </div>
+        <Box style={styles.profileData}>
+          <Typography variant="h6">Profile Data</Typography>
+          <Typography>
+            <strong>Email:</strong> {profileData.email}
+          </Typography>
+        </Box>
       )}
     </Paper>
   );
+};
+
+const styles = {
+  paper: {
+    padding: '30px',
+    maxWidth: '600px',
+    margin: 'auto',
+    marginTop: '20px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    borderRadius: '10px',
+  },
+  title: {
+    marginBottom: '20px',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  avatarBox: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '20px',
+  },
+  avatar: {
+    width: '120px',
+    height: '120px',
+  },
+  input: {
+    marginBottom: '15px',
+  },
+  profileData: {
+    marginTop: '20px',
+    padding: '10px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
 };
 
 export default Profile;

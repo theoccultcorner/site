@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Link } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 const Footer = () => {
   return (
@@ -25,9 +25,7 @@ const Footer = () => {
       <Typography variant="body1">
         © {new Date().getFullYear()} The Gnostic Union. All Rights Reserved.
       </Typography>
-      <Typography variant="body2">
-        
-      </Typography>
+      
     </Box>
   );
 };
