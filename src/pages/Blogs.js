@@ -3,7 +3,6 @@ import { Button, Avatar, TextField, Paper, Typography, Divider } from '@mui/mate
 import { auth } from '../firebaseConfig';
 import { getDatabase, ref, onValue, push, update, remove } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import DeleteButton from './DeleteButton';
 import Comments from './Comments';
 import Likes from './Likes';
 
@@ -83,13 +82,6 @@ const Blogs = () => {
     }
   };
 
-  const handleDelete = async (postId) => {
-    const db = getDatabase();
-    if (window.confirm('Are you sure you want to delete this post?')) {
-      await remove(ref(db, `blogPosts/${postId}`));
-    }
-  };
-
   const handleComment = async (postId) => {
     if (!commentText.trim()) return;
     const db = getDatabase();
@@ -150,12 +142,9 @@ const Blogs = () => {
             <Typography variant="h5" style={styles.articleTitle}>
               {post.title}
             </Typography>
-            <div style={styles.authorSection}>
-              <Avatar src={user?.photoURL} alt={user?.displayName} style={styles.avatar} />
-              <Typography variant="subtitle1" style={styles.authorName}>
-                {post.author}
-              </Typography>
-            </div>
+            <Typography variant="subtitle1" style={styles.author}>
+              {post.author}
+            </Typography>
             <Typography variant="subtitle2" style={styles.date}>
               {new Date(post.date).toLocaleString()}
             </Typography>
@@ -224,15 +213,8 @@ const styles = {
     marginBottom: '10px',
     fontWeight: 'bold',
   },
-  authorSection: {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: '10px',
-  },
-  avatar: {
-    marginRight: '10px',
-  },
-  authorName: {
+  author: {
+    marginBottom: '5px',
     fontWeight: 'bold',
   },
   date: {
