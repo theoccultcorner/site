@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Avatar, TextField, Paper, Typography, Divider } from '@mui/material';
+import { Button, Avatar, TextField, Paper, Typography, Divider, Card, CardContent, CardMedia } from '@mui/material';
 import { auth } from '../firebaseConfig';
-import { getDatabase, ref, onValue, push, update, remove } from 'firebase/database';
+import { getDatabase, ref, onValue, push, update } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Comments from './Comments';
 import Likes from './Likes';
@@ -138,38 +138,53 @@ const Blogs = () => {
       )}
       <div style={styles.articles}>
         {blogPosts.map((post) => (
-          <Paper key={post.id} style={styles.article}>
-            <Typography variant="h5" style={styles.articleTitle}>
-              {post.title}
-            </Typography>
-            <Typography variant="subtitle1" style={styles.author}>
-              {post.author}
-            </Typography>
-            <Typography variant="subtitle2" style={styles.date}>
-              {new Date(post.date).toLocaleString()}
-            </Typography>
-            <Divider style={{ margin: '10px 0' }} />
-            {post.imageUrl && <img src={post.imageUrl} alt="Post" style={styles.image} />}
-            <Typography style={styles.articleContent}>{post.content}</Typography>
-            <Comments
-              postId={post.id}
-              user={user}
-              comments={post.comments}
-              allowDelete={user && user.uid === post.userId}
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Write a comment..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              style={styles.input}
-            />
-            <Button onClick={() => handleComment(post.id)} variant="contained" color="primary" style={styles.commentButton}>
-              Comment
-            </Button>
-            <Likes postId={post.id} user={user} />
-          </Paper>
+          <Card key={post.id} style={styles.card}>
+            {post.imageUrl && (
+              <CardMedia
+                component="img"
+                height="200"
+                image={post.imageUrl}
+                alt="Post Image"
+                style={styles.cardImage}
+              />
+            )}
+            <CardContent>
+              <Typography variant="h5" style={styles.articleTitle}>
+                {post.title}
+              </Typography>
+              <Typography variant="subtitle1" style={styles.author}>
+                {post.author}
+              </Typography>
+              <Typography variant="subtitle2" style={styles.date}>
+                {new Date(post.date).toLocaleString()}
+              </Typography>
+              <Divider style={{ margin: '10px 0' }} />
+              <Typography style={styles.articleContent}>{post.content}</Typography>
+              <Comments
+                postId={post.id}
+                user={user}
+                comments={post.comments}
+                allowDelete={user && user.uid === post.userId}
+              />
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Write a comment..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                style={styles.input}
+              />
+              <Button
+                onClick={() => handleComment(post.id)}
+                variant="contained"
+                color="primary"
+                style={styles.commentButton}
+              >
+                Comment
+              </Button>
+              <Likes postId={post.id} user={user} />
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
@@ -203,11 +218,14 @@ const styles = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
     gap: '20px',
   },
-  article: {
-    padding: '20px',
-    background: '#fff',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)',
+  card: {
+    maxWidth: 400,
+    margin: '0 auto',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
     borderRadius: '8px',
+  },
+  cardImage: {
+    objectFit: 'cover',
   },
   articleTitle: {
     marginBottom: '10px',
@@ -220,11 +238,6 @@ const styles = {
   date: {
     marginBottom: '10px',
     color: '#666',
-  },
-  image: {
-    width: '100%',
-    marginBottom: '10px',
-    borderRadius: '8px',
   },
   articleContent: {
     marginBottom: '10px',
