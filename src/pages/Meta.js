@@ -16,6 +16,7 @@ import { auth, db } from '../firebaseConfig';
 import { getDatabase, ref, push, onValue, update, remove } from 'firebase/database';
 import { doc, getDoc } from 'firebase/firestore';
 import { Edit, Delete } from '@mui/icons-material';
+import Likes from './Likes'; // Import the updated Likes component
 
 const Meta = () => {
   const [messages, setMessages] = useState([]);
@@ -23,7 +24,7 @@ const Meta = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [userProfiles, setUserProfiles] = useState({});
-  const chatBoxRef = useRef(null); // Reference for the chatbox
+  const chatBoxRef = useRef(null);
 
   useEffect(() => {
     const fetchUserData = async (user) => {
@@ -89,7 +90,6 @@ const Meta = () => {
   }, []);
 
   useEffect(() => {
-    // Scroll to the newest message in the chatbox
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
@@ -157,7 +157,7 @@ const Meta = () => {
         Διαλεκτικὸς Χῶρος (Dialektikós Chōros)
       </Typography>
       <Paper
-        ref={chatBoxRef} // Attach the ref to the chatbox
+        ref={chatBoxRef}
         sx={{
           width: '100%',
           maxWidth: 600,
@@ -192,16 +192,20 @@ const Meta = () => {
                 }
                 secondary={message.text}
               />
-              {currentUser && currentUser.uid === message.uid && (
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <IconButton onClick={() => handleEdit(message)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(message.id)}>
-                    <Delete />
-                  </IconButton>
-                </Box>
-              )}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {currentUser && currentUser.uid === message.uid && (
+                  <>
+                    <IconButton onClick={() => handleEdit(message)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(message.id)}>
+                      <Delete />
+                    </IconButton>
+                  </>
+                )}
+                {/* Add Likes component */}
+                <Likes postId={message.id} user={currentUser} />
+              </Box>
             </ListItem>
           ))}
         </List>

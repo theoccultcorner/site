@@ -9,14 +9,15 @@ function ProfileList() {
   const [profiles, setProfiles] = useState([]);
 
   useEffect(() => {
+    // Fetch profiles from Firestore
     const fetchProfiles = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'profiles'));
         const fetchedProfiles = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setProfiles(fetchedProfiles);
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching profiles:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -33,8 +34,7 @@ function ProfileList() {
       {profiles.map((profile) => (
         <Grid item xs={12} sm={6} md={4} key={profile.id}>
           <Paper elevation={3} style={{ padding: '20px', textAlign: 'center' }}>
-            {/* Avatar with link */}
-            <Link to={`/profile/${profile.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Link to={`/profile/${profile.displayName}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <Avatar
                 src={profile.photoURL}
                 alt={profile.displayName}

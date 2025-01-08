@@ -8,9 +8,9 @@ import About from "./pages/About";
 import Seminary from "./pages/Seminary/Seminary";
 import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
-import Profile from "./pages/Profile";
-import ProfileList from "./pages/ProfileList";
-import UserProfile from "./pages/UserProfile";
+import Profile from "./pages/Profile"; // Current user's profile
+import ProfileList from "./pages/ProfileList"; // List of all profiles
+import UserProfile from "./pages/UserProfile"; // Specific user profile
 import Meta from "./pages/Meta";
 import Formation from "./pages/Seminary/Formation";
 import Requirements from "./pages/Seminary/Requirements";
@@ -20,19 +20,27 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Layout for the site */}
         <Route path="/" element={<Layout />}>
+          {/* Main routes */}
           <Route index element={<Home />} />
-          <Route path="About" element={<About />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="Seminary*" element={<Seminary />} />
-          <Route path="profiles" element={<ProfileList />} />
-          <Route path="/seminary/formation" element={<Formation />} />
-          <Route path="/seminary/Requirements" element={<Requirements />} />
-          <Route path="/seminary/Foundations" element={<Foundations />} />
-          <Route path="/profile/:displayName" element={<UserProfile />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
           <Route path="meta" element={<Meta />} />
           <Route path="blogs" element={<Blogs />} />
-          <Route path="contact" element={<Contact />} />
+
+          {/* Profile-related routes */}
+          <Route path="profile" element={<Profile />} /> {/* Current user's profile */}
+          <Route path="profiles" element={<ProfileList />} /> {/* List of all profiles */}
+          <Route path="profile/:displayName" element={<UserProfile />} /> {/* View specific user profile */}
+
+          {/* Seminary-related routes */}
+          <Route path="seminary/*" element={<Seminary />} />
+          <Route path="seminary/formation" element={<Formation />} />
+          <Route path="seminary/requirements" element={<Requirements />} />
+          <Route path="seminary/foundations" element={<Foundations />} />
+
+          {/* Catch-all route */}
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
