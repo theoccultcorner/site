@@ -51,9 +51,9 @@ const App = () => {
           <Route path="seminary/foundations" element={<Foundations />} />
 
           {/* New seminary program routes */}
-          <Route path="./pages/seminary/certificateprograms" element={<CertificatePrograms />} />
-          <Route path="./pages/seminary/degreeprograms" element={<DegreePrograms />} />
-          <Route path="./seminary/ministry" element={<Ministry />} />
+          <Route path="seminary/certificateprograms" element={<CertificatePrograms />} />
+          <Route path="seminary/degreeprograms" element={<DegreePrograms />} />
+          <Route path="seminary/ministry" element={<Ministry />} />
           <Route path="seminary/ecclesiastical" element={<Ecclesiastical />} />
           <Route path="seminary/fellowships" element={<Fellowships />} />
           <Route path="seminary/honorarydegrees" element={<HonoraryDegrees />} />
