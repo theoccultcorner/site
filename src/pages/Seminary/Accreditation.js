@@ -9,11 +9,11 @@ const Accreditation = () => {
       </Typography>
 
       <Typography variant="h6" style={styles.subTitle}>
-        State of Florida Department of Education
+        State of California Department of Education
       </Typography>
 
       <Typography variant="body1" style={styles.text}>
-        In the United States of America, jurisdiction over degree-granting institutions rests with the individual state governments. Compliance with state regulations is the necessary condition for offering a legitimate, legal degree. The Gnostic Catholic Union Seminary grants degrees under the authority of the Florida State Board of Independent Colleges and Universities in compliance with Section 1005.06(1)(f), Florida Statutes. The State of Florida does not require regional or theological accreditation.
+        In the United States of America, jurisdiction over degree-granting institutions rests with the individual state governments. Compliance with state regulations is the necessary condition for offering a legitimate, legal degree. The Gnostic Union grants degrees under the authority of the California Bureau for Private Postsecondary Education (BPPE) in compliance with the California Education Code, Title 3, Division 10, Part 59, Chapter 8. This compliance authorizes the seminary to offer its degree programs.
       </Typography>
 
       <Typography variant="h6" style={styles.subTitle}>
@@ -21,7 +21,11 @@ const Accreditation = () => {
       </Typography>
 
       <Typography variant="body1" style={styles.text}>
-        The Gnostic Catholic Union Seminary, as well as other Christian colleges, are <strong>NOT</strong> required to be regulated by the Florida Department of Education (FLDOE); therefore, this institution is not listed with the FLDOE as a ‘regulated’ institution. That being said, credits from the Gnostic Jesuit School of Theology likely will not transfer to another institution.
+        The Gnostic Union, as well as other Christian colleges, are <strong>NOT</strong> required to be regionally accredited by the California Department of Education or other federal accrediting bodies. While the institution operates legally within California, credits earned from the seminary may not transfer to other institutions or qualify for state licensure.
+      </Typography>
+
+      <Typography variant="body1" style={styles.text}>
+        The Gnostic Union emphasizes the spiritual and ecclesiastical application of its programs and degrees. These degrees are intended for ministry and theological enrichment within The Gnostic Union and affiliated organizations.
       </Typography>
     </Box>
   );
