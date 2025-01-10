@@ -1,16 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Avatar } from '@mui/material';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import Footer from './Footer'; // Import Footer component
-import { auth } from '../firebaseConfig';
-import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import React, { useState, useEffect } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Avatar,
+} from "@mui/material";
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import Footer from "./Footer";
+import { auth } from "../firebaseConfig";
+import {
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
 
 const Layout = () => {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [subMenuEl, setSubMenuEl] = useState(null); // For Seminary sub-menu
+  const [subMenuEl, setSubMenuEl] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,21 +40,21 @@ const Layout = () => {
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
 
-      const userRef = doc(db, 'profiles', result.user.uid);
+      const userRef = doc(db, "profiles", result.user.uid);
       const docSnap = await getDoc(userRef);
       if (!docSnap.exists()) {
         await setDoc(userRef, {
           email: result.user.email,
           displayName: result.user.displayName,
           photoURL: result.user.photoURL,
-          bio: 'This is a sample bio',
-          website: 'https://example.com',
+          bio: "This is a sample bio",
+          website: "https://example.com",
         });
       }
 
-      navigate('/profile');
+      navigate("/profile");
     } catch (error) {
-      console.error('Error occurred during login:', error);
+      console.error("Error occurred during login:", error);
     }
   };
 
@@ -50,7 +64,7 @@ const Layout = () => {
       setUser(null);
       setAnchorEl(null);
     } catch (error) {
-      console.error('Error occurred during logout:', error);
+      console.error("Error occurred during logout:", error);
     }
   };
 
@@ -74,9 +88,14 @@ const Layout = () => {
 
   return (
     <>
-      <AppBar position="static" style={{ background: 'black' }}>
+      <AppBar position="static" style={{ background: "black" }}>
         <Toolbar>
-          <Typography variant="h6" component={Link} to="/" style={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            component={Link}
+            to="/"
+            style={{ textDecoration: "none", color: "inherit", flexGrow: 1 }}
+          >
             The Gnostic Union
           </Typography>
           {user ? (
@@ -92,31 +111,41 @@ const Layout = () => {
                 {user.photoURL ? (
                   <Avatar src={user.photoURL} alt={user.displayName} />
                 ) : (
-                  <Avatar>{user.displayName ? user.displayName.charAt(0) : ''}</Avatar>
+                  <Avatar>
+                    {user.displayName ? user.displayName.charAt(0) : ""}
+                  </Avatar>
                 )}
               </IconButton>
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
                 anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 keepMounted
                 transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={() => navigateTo('/about')}>About</MenuItem>
-                <MenuItem onClick={() => navigateTo('/profile')}>Profile</MenuItem>
-                <MenuItem onClick={() => navigateTo('/profiles')}>Community</MenuItem>
+                <MenuItem onClick={() => navigateTo("/about")}>About</MenuItem>
+                <MenuItem onClick={() => navigateTo("/profile")}>
+                  Profile
+                </MenuItem>
+                <MenuItem onClick={() => navigateTo("/profiles")}>
+                  Community
+                </MenuItem>
                 <MenuItem onClick={handleSubMenu}>Seminary</MenuItem>
-                <MenuItem onClick={() => navigateTo('/meta')}>Διαλεκτικὸς Χῶρος</MenuItem>
-                <MenuItem onClick={() => navigateTo('/blogs')}>Blogs</MenuItem>
-                <MenuItem onClick={() => navigateTo('/contact')}>Contact</MenuItem>
+                <MenuItem onClick={() => navigateTo("/meta")}>
+                  Διαλεκτικὸς Χῶρος
+                </MenuItem>
+                <MenuItem onClick={() => navigateTo("/blogs")}>Blogs</MenuItem>
+                <MenuItem onClick={() => navigateTo("/contact")}>
+                  Contact
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
 
@@ -126,27 +155,52 @@ const Layout = () => {
                 open={Boolean(subMenuEl)}
                 onClose={handleClose}
                 anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
               >
-                <MenuItem onClick={() => navigateTo('/seminary')}>Seminary Home</MenuItem>
-                <MenuItem onClick={() => navigateTo('./pages/seminary/formation')}>Formation</MenuItem>
-                <MenuItem onClick={() => navigateTo('./pages/seminary/requirements')}>Requirements</MenuItem>
-                <MenuItem onClick={() => navigateTo('./pages/seminary/foundations')}>Certificate Programs</MenuItem>
-                <MenuItem onClick={() => navigateTo('./pages/seminary/Ministry')}>Ministry Degrees</MenuItem>
-                <MenuItem onClick={() => navigateTo('./pages/seminary/Ecclesiastical')}>Ecclesiastical Degrees</MenuItem>
-                <MenuItem onClick={() => navigateTo('./pages/seminary/Fellowships')}>Fellowships</MenuItem>
-                <MenuItem onClick={() => navigateTo('./pages/seminary/Honorary')}>Honorary Degree</MenuItem>
-                <MenuItem onClick={() => navigateTo('./pages/seminary/Accreditation')}>Accreditation</MenuItem>
-                
-
- 
-
+                <MenuItem onClick={() => navigateTo("/seminary")}>
+                  Seminary Home
+                </MenuItem>
+                <MenuItem onClick={() => navigateTo("/seminary/formation")}>
+                  Formation
+                </MenuItem>
+                <MenuItem onClick={() => navigateTo("/seminary/requirements")}>
+                  Requirements
+                </MenuItem>
+                <MenuItem onClick={() => navigateTo("/seminary/foundations")}>
+                  Foundations
+                </MenuItem>
+                <MenuItem
+                  onClick={() => navigateTo("/seminary/certificateprograms")}
+                >
+                  Certificate Programs
+                </MenuItem>
+                <MenuItem onClick={() => navigateTo("/seminary/ministry")}>
+                  Ministry Degrees
+                </MenuItem>
+                <MenuItem
+                  onClick={() => navigateTo("/seminary/ecclesiastical")}
+                >
+                  Ecclesiastical Degrees
+                </MenuItem>
+                <MenuItem onClick={() => navigateTo("/seminary/fellowships")}>
+                  Fellowships
+                </MenuItem>
+                <MenuItem
+                  onClick={() => navigateTo("/seminary/honorarydegrees")}
+                >
+                  Honorary Degrees
+                </MenuItem>
+                <MenuItem
+                  onClick={() => navigateTo("/seminary/accreditation")}
+                >
+                  Accreditation
+                </MenuItem>
               </Menu>
             </div>
           ) : (

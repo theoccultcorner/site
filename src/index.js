@@ -53,12 +53,12 @@ const App = () => {
           {/* New seminary program routes */}
           <Route path="./pages/seminary/certificateprograms" element={<CertificatePrograms />} />
           <Route path="./pages/seminary/degreeprograms" element={<DegreePrograms />} />
-          <Route path="./pages/seminary/ministry" element={<Ministry />} />
-          <Route path="./pages/seminary/ecclesiastical" element={<Ecclesiastical />} />
-          <Route path="./pages/seminary/fellowships" element={<Fellowships />} />
-          <Route path="./pages/seminary/honorarydegrees" element={<HonoraryDegrees />} />
-          <Route path="./pages/seminary/recommended" element={<Recommended />} />
-          <Route path="./pages/seminary/accreditation" element={<Accreditation />} />
+          <Route path="./seminary/ministry" element={<Ministry />} />
+          <Route path="seminary/ecclesiastical" element={<Ecclesiastical />} />
+          <Route path="seminary/fellowships" element={<Fellowships />} />
+          <Route path="seminary/honorarydegrees" element={<HonoraryDegrees />} />
+          <Route path="seminary/recommended" element={<Recommended />} />
+          <Route path="seminary/accreditation" element={<Accreditation />} />
 
           {/* Catch-all route */}
           <Route path="*" element={<NoPage />} />
