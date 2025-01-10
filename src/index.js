@@ -16,6 +16,16 @@ import Formation from "./pages/Seminary/Formation";
 import Requirements from "./pages/Seminary/Requirements";
 import Foundations from "./pages/Seminary/Foundations";
 
+// Newly added components
+import CertificatePrograms from "./pages/Seminary/CertificatePrograms";
+import DegreePrograms from "./pages/Seminary/DegreePrograms";
+import Ministry from "./pages/Seminary/Ministry";
+import Ecclesiastical from "./pages/Seminary/Ecclesiastical";
+import Fellowships from "./pages/Seminary/Fellowships";
+import HonoraryDegrees from "./pages/Seminary/HonoraryDegrees";
+import Recommended from "./pages/Seminary/Recommended";
+import Accreditation from "./pages/Seminary/Accreditation";
+
 const App = () => {
   return (
     <BrowserRouter>
@@ -35,10 +45,20 @@ const App = () => {
           <Route path="profile/:displayName" element={<UserProfile />} /> {/* View specific user profile */}
 
           {/* Seminary-related routes */}
-          <Route path="seminary/*" element={<Seminary />} />
+          <Route path="seminary" element={<Seminary />} />
           <Route path="seminary/formation" element={<Formation />} />
           <Route path="seminary/requirements" element={<Requirements />} />
           <Route path="seminary/foundations" element={<Foundations />} />
+
+          {/* New seminary program routes */}
+          <Route path="./pages/seminary/certificateprograms" element={<CertificatePrograms />} />
+          <Route path="./pages/seminary/degreeprograms" element={<DegreePrograms />} />
+          <Route path="./pages/seminary/ministry" element={<Ministry />} />
+          <Route path="./pages/seminary/ecclesiastical" element={<Ecclesiastical />} />
+          <Route path="./pages/seminary/fellowships" element={<Fellowships />} />
+          <Route path="./pages/seminary/honorarydegrees" element={<HonoraryDegrees />} />
+          <Route path="./pages/seminary/recommended" element={<Recommended />} />
+          <Route path="./pages/seminary/accreditation" element={<Accreditation />} />
 
           {/* Catch-all route */}
           <Route path="*" element={<NoPage />} />

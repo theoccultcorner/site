@@ -135,9 +135,18 @@ const Layout = () => {
                 }}
               >
                 <MenuItem onClick={() => navigateTo('/seminary')}>Seminary Home</MenuItem>
-                <MenuItem onClick={() => navigateTo('/seminary/formation')}>Formation</MenuItem>
-                <MenuItem onClick={() => navigateTo('/seminary/requirements')}>Requirements</MenuItem>
-                <MenuItem onClick={() => navigateTo('/seminary/foundations')}>Foundations</MenuItem>
+                <MenuItem onClick={() => navigateTo('./pages/seminary/formation')}>Formation</MenuItem>
+                <MenuItem onClick={() => navigateTo('./pages/seminary/requirements')}>Requirements</MenuItem>
+                <MenuItem onClick={() => navigateTo('./pages/seminary/foundations')}>Certificate Programs</MenuItem>
+                <MenuItem onClick={() => navigateTo('./pages/seminary/Ministry')}>Ministry Degrees</MenuItem>
+                <MenuItem onClick={() => navigateTo('./pages/seminary/Ecclesiastical')}>Ecclesiastical Degrees</MenuItem>
+                <MenuItem onClick={() => navigateTo('./pages/seminary/Fellowships')}>Fellowships</MenuItem>
+                <MenuItem onClick={() => navigateTo('./pages/seminary/Honorary')}>Honorary Degree</MenuItem>
+                <MenuItem onClick={() => navigateTo('./pages/seminary/Accreditation')}>Accreditation</MenuItem>
+                
+
+ 
+
               </Menu>
             </div>
           ) : (
