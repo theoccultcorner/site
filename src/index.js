@@ -20,9 +20,7 @@ import Foundations from "./pages/Seminary/Foundations";
 import CertificatePrograms from "./pages/Seminary/CertificatePrograms";
 import DegreePrograms from "./pages/Seminary/DegreePrograms";
 import Ministry from "./pages/Seminary/Ministry";
-import Ecclesiastical from "./pages/Seminary/Ecclesiastical";
-import Fellowships from "./pages/Seminary/Fellowships";
-import HonoraryDegrees from "./pages/Seminary/HonoraryDegrees";
+ 
 import Recommended from "./pages/Seminary/Recommended";
 import Accreditation from "./pages/Seminary/Accreditation";
 
@@ -54,9 +52,7 @@ const App = () => {
           <Route path="seminary/certificateprograms" element={<CertificatePrograms />} />
           <Route path="seminary/degreeprograms" element={<DegreePrograms />} />
           <Route path="seminary/ministry" element={<Ministry />} />
-          <Route path="seminary/ecclesiastical" element={<Ecclesiastical />} />
-          <Route path="seminary/fellowships" element={<Fellowships />} />
-          <Route path="seminary/honorarydegrees" element={<HonoraryDegrees />} />
+   
           <Route path="seminary/recommended" element={<Recommended />} />
           <Route path="seminary/accreditation" element={<Accreditation />} />
 

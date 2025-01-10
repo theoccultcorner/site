@@ -183,19 +183,7 @@ const Layout = () => {
                 <MenuItem onClick={() => navigateTo("/seminary/ministry")}>
                   Ministry Degrees
                 </MenuItem>
-                <MenuItem
-                  onClick={() => navigateTo("/seminary/ecclesiastical")}
-                >
-                  Ecclesiastical Degrees
-                </MenuItem>
-                <MenuItem onClick={() => navigateTo("/seminary/fellowships")}>
-                  Fellowships
-                </MenuItem>
-                <MenuItem
-                  onClick={() => navigateTo("/seminary/honorarydegrees")}
-                >
-                  Honorary Degrees
-                </MenuItem>
+               
                 <MenuItem
                   onClick={() => navigateTo("/seminary/accreditation")}
                 >
