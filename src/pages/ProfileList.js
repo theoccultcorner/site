@@ -9,11 +9,13 @@ function ProfileList() {
   const [profiles, setProfiles] = useState([]);
 
   useEffect(() => {
-    // Fetch profiles from Firestore
     const fetchProfiles = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'profiles'));
-        const fetchedProfiles = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const fetchedProfiles = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setProfiles(fetchedProfiles);
       } catch (error) {
         console.error('Error fetching profiles:', error);
@@ -25,6 +27,9 @@ function ProfileList() {
     fetchProfiles();
   }, []);
 
+  const sanitizeDisplayName = (name) =>
+    name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9()]/g, ''); // Remove spaces and special characters
+
   if (loading) {
     return <Typography variant="h6" align="center">Loading...</Typography>;
   }
@@ -34,7 +39,10 @@ function ProfileList() {
       {profiles.map((profile) => (
         <Grid item xs={12} sm={6} md={4} key={profile.id}>
           <Paper elevation={3} style={{ padding: '20px', textAlign: 'center' }}>
-            <Link to={`/profile/${profile.displayName}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Link
+              to={`/users/${sanitizeDisplayName(profile.displayName)}`}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
               <Avatar
                 src={profile.photoURL}
                 alt={profile.displayName}
@@ -45,7 +53,14 @@ function ProfileList() {
               </Typography>
             </Link>
             <Typography variant="body1">
-              <strong>Email:</strong> {profile.email || 'Not provided'}
+              <strong>Email:</strong>{' '}
+              {profile.email ? (
+                <a href={`mailto:${profile.email}`} style={{ color: 'inherit' }}>
+                  {profile.email}
+                </a>
+              ) : (
+                'Not provided'
+              )}
             </Typography>
             <Typography variant="body1">
               <strong>Bio:</strong> {profile.bio || 'No bio available'}

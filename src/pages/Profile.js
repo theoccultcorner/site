@@ -8,16 +8,14 @@ import {
   Grid,
   Box,
   Divider,
-  Modal,
   IconButton,
+  Modal,
 } from '@mui/material';
 import { auth } from '../firebaseConfig';
 import { db } from '../firebaseConfig';
-import { getDatabase, ref, push } from 'firebase/database'; // Added missing imports
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, updateDoc, addDoc, getDocs, deleteDoc } from 'firebase/firestore';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import UserBlogPosts from './UserBlogPosts';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -25,16 +23,14 @@ const Profile = () => {
   const [photoURL, setPhotoURL] = useState('');
   const [bio, setBio] = useState('');
   const [website, setWebsite] = useState('');
+  const [links, setLinks] = useState('');
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
-
-  // State for the blog creation modal
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [postTitle, setPostTitle] = useState('');
-  const [postContent, setPostContent] = useState('');
-  const [postImage, setPostImage] = useState(null);
-  const [postImagePreview, setPostImagePreview] = useState('');
+  const [blogs, setBlogs] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [currentBlog, setCurrentBlog] = useState({ id: null, title: '', content: '' });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -43,6 +39,7 @@ const Profile = () => {
         setDisplayName(currentUser.displayName || '');
         setPhotoURL(currentUser.photoURL || '');
         await fetchProfileData(currentUser.uid);
+        await fetchBlogs(currentUser.uid);
       }
     });
     return () => unsubscribe();
@@ -56,9 +53,21 @@ const Profile = () => {
         const userData = docSnap.data();
         setBio(userData.bio || '');
         setWebsite(userData.website || '');
+        setLinks(userData.links || '');
       }
     } catch (error) {
       console.error('Error fetching profile data:', error);
+    }
+  };
+
+  const fetchBlogs = async (userId) => {
+    try {
+      const blogsRef = collection(db, `profiles/${userId}/blogs`);
+      const querySnapshot = await getDocs(blogsRef);
+      const fetchedBlogs = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setBlogs(fetchedBlogs);
+    } catch (error) {
+      console.error('Error fetching blogs:', error);
     }
   };
 
@@ -80,10 +89,10 @@ const Profile = () => {
     try {
       const docRef = doc(db, 'profiles', user.uid);
       await updateDoc(docRef, {
-        displayName: displayName.trim(),
         photoURL: profileImageUrl,
         bio: bio.trim(),
         website: website.trim(),
+        links: links.trim(),
       });
 
       setPhotoURL(profileImageUrl);
@@ -101,50 +110,57 @@ const Profile = () => {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const handleCreatePost = async () => {
-    if (!postTitle.trim() || !postContent.trim()) {
-      alert('Please fill in all fields.');
+  const handleSaveBlog = async () => {
+    if (!currentBlog.title || !currentBlog.content) {
+      alert('Title and content are required.');
       return;
     }
 
-    let postImageUrl = '';
-    if (postImage) {
-      const storage = getStorage();
-      const imageRef = storageRef(storage, `blogImages/${postImage.name}`);
-      try {
-        const snapshot = await uploadBytes(imageRef, postImage);
-        postImageUrl = await getDownloadURL(snapshot.ref);
-      } catch (error) {
-        console.error('Error uploading post image:', error);
-      }
-    }
-
-    const newPost = {
-      title: postTitle.trim(),
-      content: postContent.trim(),
-      imageUrl: postImageUrl || '',
-      author: displayName,
-      date: new Date().toISOString(),
-    };
-
     try {
-      const database = getDatabase(); // Initialize the Realtime Database
-      await push(ref(database, 'blogPosts'), newPost); // Push the new post
-      console.log('Post created successfully!');
-      setPostTitle('');
-      setPostContent('');
-      setPostImage(null);
-      setPostImagePreview('');
-      setCreateModalOpen(false);
+      const blogsRef = collection(db, `profiles/${user.uid}/blogs`);
+      if (editMode) {
+        const blogDoc = doc(db, `profiles/${user.uid}/blogs/${currentBlog.id}`);
+        await updateDoc(blogDoc, {
+          title: currentBlog.title,
+          content: currentBlog.content,
+        });
+        setBlogs((prevBlogs) =>
+          prevBlogs.map((blog) =>
+            blog.id === currentBlog.id
+              ? { ...blog, title: currentBlog.title, content: currentBlog.content }
+              : blog
+          )
+        );
+      } else {
+        const newDoc = await addDoc(blogsRef, {
+          title: currentBlog.title,
+          content: currentBlog.content,
+        });
+        setBlogs([...blogs, { id: newDoc.id, title: currentBlog.title, content: currentBlog.content }]);
+      }
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error('Error saving blog:', error);
+    } finally {
+      setModalOpen(false);
+      setCurrentBlog({ id: null, title: '', content: '' });
+      setEditMode(false);
     }
   };
 
-  const handlePostImageChange = (e) => {
-    const file = e.target.files[0];
-    setPostImage(file);
-    setPostImagePreview(URL.createObjectURL(file));
+  const handleEditBlog = (blog) => {
+    setCurrentBlog(blog);
+    setEditMode(true);
+    setModalOpen(true);
+  };
+
+  const handleDeleteBlog = async (blogId) => {
+    try {
+      const blogDoc = doc(db, `profiles/${user.uid}/blogs/${blogId}`);
+      await deleteDoc(blogDoc);
+      setBlogs(blogs.filter((blog) => blog.id !== blogId));
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+    }
   };
 
   return (
@@ -200,8 +216,8 @@ const Profile = () => {
             <TextField
               label="Display Name"
               value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
               fullWidth
+              disabled // Prevent editing of display name
               style={styles.input}
             />
           </Grid>
@@ -226,6 +242,17 @@ const Profile = () => {
             />
           </Grid>
           <Grid item xs={12}>
+            <TextField
+              label="Links (e.g., Linktree)"
+              value={links}
+              onChange={(e) => setLinks(e.target.value)}
+              fullWidth
+              multiline
+              rows={2}
+              style={styles.input}
+            />
+          </Grid>
+          <Grid item xs={12}>
             <Button
               variant="contained"
               color="primary"
@@ -242,7 +269,7 @@ const Profile = () => {
 
       <Divider style={{ margin: '20px 0' }} />
 
-      {/* My Blogs Section */}
+      {/* Blog Section */}
       <Box>
         <Typography variant="h6" style={styles.sectionTitle}>
           My Blogs
@@ -250,64 +277,67 @@ const Profile = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => setCreateModalOpen(true)}
+          onClick={() => setModalOpen(true)}
           style={styles.createButton}
         >
           Create Blog Post
         </Button>
-        <UserBlogPosts displayName={displayName} />
+        <Grid container spacing={2}>
+          {blogs.map((blog) => (
+            <Grid item xs={12} key={blog.id}>
+              <Paper style={{ padding: '20px' }}>
+                <Typography variant="h6">{blog.title}</Typography>
+                <Typography variant="body1" style={{ marginBottom: '10px' }}>
+                  {blog.content}
+                </Typography>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => handleEditBlog(blog)}
+                  style={{ marginRight: '10px' }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => handleDeleteBlog(blog.id)}
+                >
+                  Delete
+                </Button>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
 
-      {/* Create Blog Modal */}
-      <Modal open={createModalOpen} onClose={() => setCreateModalOpen(false)}>
-        <Box sx={styles.modal}>
-          <Typography variant="h6" gutterBottom>Create a New Blog Post</Typography>
+      {/* Create/Edit Blog Modal */}
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box style={styles.modal}>
+          <Typography variant="h6">{editMode ? 'Edit Blog Post' : 'Create Blog Post'}</Typography>
           <TextField
             label="Title"
-            value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
+            value={currentBlog.title}
+            onChange={(e) => setCurrentBlog({ ...currentBlog, title: e.target.value })}
             fullWidth
-            style={styles.input}
+            style={{ marginBottom: '10px' }}
           />
           <TextField
             label="Content"
-            value={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
+            value={currentBlog.content}
+            onChange={(e) => setCurrentBlog({ ...currentBlog, content: e.target.value })}
             fullWidth
             multiline
             rows={4}
-            style={styles.input}
+            style={{ marginBottom: '10px' }}
           />
-          <Box style={styles.imageUpload}>
-            <input
-              type="file"
-              accept="image/*"
-              id="post-image-upload"
-              style={{ display: 'none' }}
-              onChange={handlePostImageChange}
-            />
-            <label htmlFor="post-image-upload">
-              <IconButton color="primary" component="span">
-                <AddPhotoAlternateIcon />
-              </IconButton>
-            </label>
-            <Typography variant="body2">Upload an image (optional)</Typography>
-          </Box>
-          {postImagePreview && (
-            <img
-              src={postImagePreview}
-              alt="Preview"
-              style={{ width: '100%', maxHeight: '200px', marginBottom: '15px', borderRadius: '8px' }}
-            />
-          )}
           <Button
             variant="contained"
             color="primary"
-            onClick={handleCreatePost}
+            onClick={handleSaveBlog}
             fullWidth
-            style={styles.saveButton}
           >
-            Create Post
+            Save
           </Button>
         </Box>
       </Modal>
@@ -336,7 +366,6 @@ const styles = {
     height: '120px',
     marginBottom: '10px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    cursor: 'pointer',
   },
   editIcon: {
     position: 'absolute',
@@ -354,22 +383,9 @@ const styles = {
     color: '#666',
     marginBottom: '10px',
   },
-  websiteLink: {
-    color: '#1976d2',
-    textDecoration: 'none',
-    textAlign: 'center',
-    display: 'block',
-    marginTop: '5px',
-  },
   sectionTitle: {
     fontWeight: 'bold',
     marginBottom: '15px',
-  },
-  input: {
-    marginBottom: '15px',
-  },
-  saveButton: {
-    padding: '10px',
   },
   createButton: {
     marginBottom: '20px',
@@ -379,19 +395,11 @@ const styles = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '80%',
-    maxWidth: '500px',
-    backgroundColor: 'white',
-    border: '2px solid #000',
-    borderRadius: '10px',
-    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#fff',
     padding: '20px',
-  },
-  imageUpload: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    marginBottom: '15px',
+    borderRadius: '8px',
+    width: '400px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
   },
 };
 

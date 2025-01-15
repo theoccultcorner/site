@@ -20,7 +20,6 @@ import Foundations from "./pages/Seminary/Foundations";
 import CertificatePrograms from "./pages/Seminary/CertificatePrograms";
 import DegreePrograms from "./pages/Seminary/DegreePrograms";
 import Ministry from "./pages/Seminary/Ministry";
- 
 import Recommended from "./pages/Seminary/Recommended";
 import Accreditation from "./pages/Seminary/Accreditation";
 
@@ -40,7 +39,7 @@ const App = () => {
           {/* Profile-related routes */}
           <Route path="profile" element={<Profile />} /> {/* Current user's profile */}
           <Route path="profiles" element={<ProfileList />} /> {/* List of all profiles */}
-          <Route path="profile/:displayName" element={<UserProfile />} /> {/* View specific user profile */}
+          <Route path="users/:displayName" element={<UserProfile />} /> {/* View specific user profile */}
 
           {/* Seminary-related routes */}
           <Route path="seminary" element={<Seminary />} />
@@ -52,7 +51,6 @@ const App = () => {
           <Route path="seminary/certificateprograms" element={<CertificatePrograms />} />
           <Route path="seminary/degreeprograms" element={<DegreePrograms />} />
           <Route path="seminary/ministry" element={<Ministry />} />
-   
           <Route path="seminary/recommended" element={<Recommended />} />
           <Route path="seminary/accreditation" element={<Accreditation />} />
 

@@ -1,127 +1,172 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import { getDatabase, ref, onValue } from 'firebase/database';
-import { Avatar, Typography, Grid, Card, CardContent, Paper, Divider } from '@mui/material';
+import { Avatar, Typography, Paper, Box } from '@mui/material';
 
 function UserProfile() {
-  const { displayName } = useParams(); // Get displayName from route params
-  const [profile, setProfile] = useState(null);
-  const [blogPosts, setBlogPosts] = useState([]);
+  const { displayName } = useParams(); // Get displayName from URL
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const profilesRef = collection(db, 'profiles');
-        const q = query(profilesRef, where('displayName', '==', displayName));
-        const querySnapshot = await getDocs(q);
+  const sanitizeDisplayName = (name) =>
+    name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9()]/g, ''); // Same sanitization logic
 
-        if (!querySnapshot.empty) {
-          const profileData = querySnapshot.docs[0].data(); // Assuming displayName is unique
-          setProfile(profileData);
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'profiles'));
+        const sanitizedDisplayName = sanitizeDisplayName(displayName);
+        const matchingProfile = querySnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .find((profile) => sanitizeDisplayName(profile.displayName) === sanitizedDisplayName);
+
+        if (matchingProfile) {
+          setUser(matchingProfile);
         } else {
-          console.error('No profile found for displayName:', displayName);
+          console.error('User not found');
         }
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        console.error('Error fetching user profile:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchBlogPosts = () => {
-      const database = getDatabase();
-      const postsRef = ref(database, 'blogPosts');
-      onValue(postsRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const postsArray = Object.entries(data).map(([key, value]) => ({
-            id: key,
-            ...value,
-          }));
-          const userPosts = postsArray.filter(
-            (post) => post.author?.toLowerCase() === displayName.toLowerCase()
-          );
-          setBlogPosts(userPosts);
-        }
-      });
-    };
-
-    fetchProfile();
-    fetchBlogPosts();
+    fetchUser();
   }, [displayName]);
 
   if (loading) {
     return <Typography variant="h6" align="center">Loading...</Typography>;
   }
 
-  if (!profile) {
-    return <Typography variant="h6" align="center">User profile not found.</Typography>;
+  if (!user) {
+    return <Typography variant="h6" align="center">User not found.</Typography>;
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      {/* Profile Details */}
-      <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px', textAlign: 'center' }}>
+    <Paper style={styles.paper}>
+      <Box style={styles.profileHeader}>
         <Avatar
-          src={profile.photoURL}
-          alt={profile.displayName}
-          sx={{
-            width: 100,
-            height: 100,
-            margin: '0 auto',
-            marginBottom: '10px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-          }}
+          src={user.photoURL}
+          alt={user.displayName}
+          style={styles.avatar}
         />
-        <Typography variant="h5" gutterBottom>{profile.displayName}</Typography>
-        <Typography variant="body1" color="textSecondary">{profile.bio || 'No bio available'}</Typography>
-        {profile.website && (
-          <Typography variant="body2">
-            <a href={profile.website} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: '#1976d2' }}>
-              {profile.website}
+        <Typography variant="h5" style={styles.displayName}>
+          {user.displayName}
+        </Typography>
+        <Typography variant="body2" style={styles.bio}>
+          {user.bio || 'No bio available'}
+        </Typography>
+        {user.email && (
+          <Typography variant="body2" style={styles.email}>
+            <a href={`mailto:${user.email}`} style={styles.emailLink}>
+              {user.email}
             </a>
           </Typography>
         )}
-      </Paper>
-
-      <Divider style={{ margin: '20px 0' }} />
-
-      {/* Blog Posts */}
-      <Typography variant="h6" gutterBottom>
-        Blog Posts by {profile.displayName}
-      </Typography>
-      <Grid container spacing={3}>
-        {blogPosts.length > 0 ? (
-          blogPosts.map((post) => (
-            <Grid item xs={12} sm={6} md={4} key={post.id}>
-              <Card>
-                {post.imageUrl && (
-                  <img
-                    src={post.imageUrl}
-                    alt={post.title}
-                    style={{ width: '100%', height: '150px', objectFit: 'cover' }}
-                  />
-                )}
-                <CardContent>
-                  <Typography variant="h6">{post.title}</Typography>
-                  <Typography variant="body2" style={{ marginTop: '10px' }}>
-                    {post.content.substring(0, 100)}...
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))
-        ) : (
-          <Typography variant="body2" align="center" style={{ width: '100%' }}>
-            No blog posts available.
+        {user.website && (
+          <Typography variant="body2">
+            <a
+              href={user.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.websiteLink}
+            >
+              {user.website}
+            </a>
           </Typography>
         )}
-      </Grid>
-    </div>
+        {user.links && (
+          <Box style={styles.linksContainer}>
+            <Typography variant="h6" style={styles.linksTitle}>
+              Additional Links
+            </Typography>
+            <ul style={styles.linksList}>
+              {user.links.split(',').map((link, index) => (
+                <li key={index} style={styles.linksItem}>
+                  <a
+                    href={link.trim()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.link}
+                  >
+                    {link.trim()}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </Box>
+        )}
+      </Box>
+    </Paper>
   );
 }
+
+const styles = {
+  paper: {
+    padding: '20px',
+    maxWidth: '600px',
+    margin: 'auto',
+    marginTop: '20px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    borderRadius: '10px',
+    backgroundColor: '#fff',
+  },
+  profileHeader: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: '100px',
+    height: '100px',
+    marginBottom: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  },
+  displayName: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: '5px',
+  },
+  bio: {
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: '10px',
+  },
+  email: {
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: '10px',
+  },
+  emailLink: {
+    color: '#1976d2',
+    textDecoration: 'none',
+  },
+  websiteLink: {
+    color: '#1976d2',
+    textDecoration: 'none',
+    textAlign: 'center',
+  },
+  linksContainer: {
+    marginTop: '20px',
+    textAlign: 'center',
+  },
+  linksTitle: {
+    fontWeight: 'bold',
+    marginBottom: '10px',
+  },
+  linksList: {
+    listStyleType: 'none',
+    padding: 0,
+  },
+  linksItem: {
+    marginBottom: '10px',
+  },
+  link: {
+    color: '#1976d2',
+    textDecoration: 'none',
+  },
+};
 
 export default UserProfile;
