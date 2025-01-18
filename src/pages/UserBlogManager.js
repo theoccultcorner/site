@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  Modal,
-  Box,
-  Grid,
-} from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { Button, TextField, Typography, Paper, Modal, Box, Grid } from '@mui/material';
 
-const UserBlogManager = ({ userId }) => {
+const UserBlogManager = ({ userId, displayName }) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -21,15 +13,8 @@ const UserBlogManager = ({ userId }) => {
   const [blogImage, setBlogImage] = useState(null);
   const [blogImagePreview, setBlogImagePreview] = useState('');
 
-  useEffect(() => {
-    if (!userId) {
-      console.error('User ID is missing');
-      return;
-    }
-    fetchBlogs();
-  }, [userId]);
-
-  const fetchBlogs = async () => {
+  // Memoized function to fetch blogs
+  const fetchBlogs = useCallback(async () => {
     try {
       setLoading(true);
       const blogsRef = collection(db, `profiles/${userId}/blogs`);
@@ -41,7 +26,11 @@ const UserBlogManager = ({ userId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) fetchBlogs();
+  }, [userId, fetchBlogs]);
 
   const handleSaveBlog = async () => {
     if (!currentBlog.title || !currentBlog.content) {
@@ -64,26 +53,17 @@ const UserBlogManager = ({ userId }) => {
 
     try {
       const blogsRef = collection(db, `profiles/${userId}/blogs`);
+      const publicBlogsRef = collection(db, 'publicBlogs');
+
       if (editMode) {
         const blogDoc = doc(db, `profiles/${userId}/blogs/${currentBlog.id}`);
-        await updateDoc(blogDoc, {
-          title: currentBlog.title,
-          content: currentBlog.content,
-          imageUrl,
-        });
-        setBlogs((prevBlogs) =>
-          prevBlogs.map((blog) =>
-            blog.id === currentBlog.id ? { ...blog, title: currentBlog.title, content: currentBlog.content, imageUrl } : blog
-          )
-        );
+        await updateDoc(blogDoc, { ...currentBlog, imageUrl });
       } else {
-        const newDoc = await addDoc(blogsRef, {
-          title: currentBlog.title,
-          content: currentBlog.content,
-          imageUrl,
-        });
-        setBlogs([...blogs, { id: newDoc.id, title: currentBlog.title, content: currentBlog.content, imageUrl }]);
+        const newDoc = await addDoc(blogsRef, { ...currentBlog, imageUrl, author: displayName });
+        await addDoc(publicBlogsRef, { ...currentBlog, id: newDoc.id, imageUrl, author: displayName });
       }
+
+      fetchBlogs();
     } catch (error) {
       console.error('Error saving blog:', error);
     } finally {
@@ -93,13 +73,6 @@ const UserBlogManager = ({ userId }) => {
       setBlogImagePreview('');
       setEditMode(false);
     }
-  };
-
-  const handleEditBlog = (blog) => {
-    setCurrentBlog(blog);
-    setBlogImagePreview(blog.imageUrl || '');
-    setEditMode(true);
-    setModalOpen(true);
   };
 
   const handleDeleteBlog = async (blogId) => {
@@ -158,7 +131,11 @@ const UserBlogManager = ({ userId }) => {
                 <Button
                   variant="outlined"
                   color="primary"
-                  onClick={() => handleEditBlog(blog)}
+                  onClick={() => {
+                    setCurrentBlog(blog);
+                    setEditMode(true);
+                    setModalOpen(true);
+                  }}
                   style={{ marginRight: '10px' }}
                 >
                   Edit
@@ -175,7 +152,6 @@ const UserBlogManager = ({ userId }) => {
           ))}
         </Grid>
       )}
-      {/* Create/Edit Blog Modal */}
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box style={styles.modal}>
           <Typography variant="h6">{editMode ? 'Edit Blog Post' : 'Create Blog Post'}</Typography>
@@ -195,33 +171,28 @@ const UserBlogManager = ({ userId }) => {
             rows={4}
             style={{ marginBottom: '10px' }}
           />
-          <Box style={{ marginBottom: '10px' }}>
+          <Box>
             <input
               type="file"
               accept="image/*"
-              id="blog-image-upload"
               style={{ display: 'none' }}
+              id="blog-image-upload"
               onChange={handleBlogImageChange}
             />
             <label htmlFor="blog-image-upload">
-              <Button variant="outlined" component="span">
-                Upload Image
+              <Button variant="outlined" component="span" style={{ marginBottom: '10px' }}>
+                Upload Blog Image
               </Button>
             </label>
             {blogImagePreview && (
               <img
                 src={blogImagePreview}
                 alt="Preview"
-                style={{ width: '100%', height: 'auto', marginTop: '10px', borderRadius: '8px' }}
+                style={{ width: '100%', maxHeight: '200px', marginBottom: '10px' }}
               />
             )}
           </Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSaveBlog}
-            fullWidth
-          >
+          <Button variant="contained" color="primary" onClick={handleSaveBlog} fullWidth>
             Save
           </Button>
         </Box>

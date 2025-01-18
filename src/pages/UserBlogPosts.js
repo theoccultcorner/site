@@ -1,81 +1,231 @@
 import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, onValue } from 'firebase/database';
-import { Typography, Grid, Card, CardContent, CardMedia } from '@mui/material';
+import {
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Modal,
+  Box,
+  Grid,
+} from '@mui/material';
+import { db } from '../firebaseConfig';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-function UserBlogPosts({ displayName }) {
-  const [blogPosts, setBlogPosts] = useState([]);
+const UserBlogManager = ({ userId, displayName }) => {
+  const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [currentBlog, setCurrentBlog] = useState({ id: null, title: '', content: '', imageUrl: '' });
+  const [blogImage, setBlogImage] = useState(null);
+  const [blogImagePreview, setBlogImagePreview] = useState('');
 
   useEffect(() => {
-    if (!displayName) {
+    if (!userId) return;
+    fetchBlogs();
+  }, [userId]);
+
+  const fetchBlogs = async () => {
+    try {
+      setLoading(true);
+      const blogsRef = collection(db, `profiles/${userId}/blogs`);
+      const querySnapshot = await getDocs(blogsRef);
+      const fetchedBlogs = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setBlogs(fetchedBlogs);
+    } catch (error) {
+      console.error('Error fetching blogs:', error);
+    } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveBlog = async () => {
+    if (!currentBlog.title || !currentBlog.content) {
+      alert('Title and content are required.');
       return;
     }
 
-    const fetchBlogPosts = () => {
-      const db = getDatabase();
-      const postsRef = ref(db, 'blogPosts');
-      onValue(postsRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const postsArray = Object.entries(data).map(([key, value]) => ({
-            id: key,
-            ...value,
-          }));
-          // Filter posts by matching `author` with `displayName`
-          const userPosts = postsArray.filter(
-            (post) =>
-              post.author &&
-              post.author.trim().toLowerCase() === displayName.trim().toLowerCase()
-          );
-          setBlogPosts(userPosts.reverse());
-        } else {
-          setBlogPosts([]);
-        }
-        setLoading(false);
-      });
-    };
+    let imageUrl = currentBlog.imageUrl;
 
-    fetchBlogPosts();
-  }, [displayName]);
+    if (blogImage) {
+      try {
+        const storage = getStorage();
+        const imageRef = storageRef(storage, `blogImages/${blogImage.name}`);
+        const snapshot = await uploadBytes(imageRef, blogImage);
+        imageUrl = await getDownloadURL(snapshot.ref);
+      } catch (error) {
+        console.error('Error uploading blog image:', error);
+      }
+    }
 
-  if (loading) {
-    return <Typography variant="h6" align="center">Loading blog posts...</Typography>;
-  }
+    try {
+      const blogsRef = collection(db, `profiles/${userId}/blogs`);
+      const publicBlogsRef = collection(db, 'publicBlogs');
 
-  if (blogPosts.length === 0) {
-    return <Typography variant="body1" align="center">No blog posts available.</Typography>;
-  }
+      if (editMode) {
+        const blogDoc = doc(db, `profiles/${userId}/blogs/${currentBlog.id}`);
+        await updateDoc(blogDoc, { ...currentBlog, imageUrl });
+      } else {
+        const newDoc = await addDoc(blogsRef, { ...currentBlog, imageUrl, author: displayName });
+        await addDoc(publicBlogsRef, { ...currentBlog, id: newDoc.id, imageUrl, author: displayName });
+      }
+
+      fetchBlogs();
+    } catch (error) {
+      console.error('Error saving blog:', error);
+    } finally {
+      setModalOpen(false);
+      setCurrentBlog({ id: null, title: '', content: '', imageUrl: '' });
+      setBlogImage(null);
+      setBlogImagePreview('');
+      setEditMode(false);
+    }
+  };
+
+  const handleDeleteBlog = async (blogId) => {
+    try {
+      const blogDoc = doc(db, `profiles/${userId}/blogs/${blogId}`);
+      await deleteDoc(blogDoc);
+      setBlogs(blogs.filter((blog) => blog.id !== blogId));
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+    }
+  };
+
+  const handleBlogImageChange = (e) => {
+    const file = e.target.files[0];
+    setBlogImage(file);
+    setBlogImagePreview(URL.createObjectURL(file));
+  };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <Typography variant="h6" gutterBottom>
-        Blog Posts by {displayName}
+    <Box>
+      <Typography variant="h6" style={{ marginBottom: '20px' }}>
+        Manage Blogs
       </Typography>
-      <Grid container spacing={3}>
-        {blogPosts.map((post) => (
-          <Grid item xs={12} sm={6} md={4} key={post.id}>
-            <Card>
-              {post.imageUrl && (
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={post.imageUrl}
-                  alt={post.title}
-                />
-              )}
-              <CardContent>
-                <Typography variant="h6">{post.title}</Typography>
-                <Typography variant="body2" style={{ marginTop: '10px' }}>
-                  {post.content}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          setCurrentBlog({ id: null, title: '', content: '', imageUrl: '' });
+          setBlogImage(null);
+          setBlogImagePreview('');
+          setEditMode(false);
+          setModalOpen(true);
+        }}
+        style={{ marginBottom: '20px' }}
+      >
+        Create Blog Post
+      </Button>
+      {loading ? (
+        <Typography>Loading...</Typography>
+      ) : (
+        <Grid container spacing={2}>
+          {blogs.map((blog) => (
+            <Grid item xs={12} key={blog.id}>
+              <Paper style={{ padding: '20px' }}>
+                {blog.imageUrl && (
+                  <img
+                    src={blog.imageUrl}
+                    alt={blog.title}
+                    style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
+                  />
+                )}
+                <Typography variant="h6">{blog.title}</Typography>
+                <Typography variant="body1" style={{ marginBottom: '10px' }}>
+                  {blog.content}
                 </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </div>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => {
+                    setCurrentBlog(blog);
+                    setEditMode(true);
+                    setModalOpen(true);
+                  }}
+                  style={{ marginRight: '10px' }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => handleDeleteBlog(blog.id)}
+                >
+                  Delete
+                </Button>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box style={styles.modal}>
+          <Typography variant="h6">{editMode ? 'Edit Blog Post' : 'Create Blog Post'}</Typography>
+          <TextField
+            label="Title"
+            value={currentBlog.title}
+            onChange={(e) => setCurrentBlog({ ...currentBlog, title: e.target.value })}
+            fullWidth
+            style={{ marginBottom: '10px' }}
+          />
+          <TextField
+            label="Content"
+            value={currentBlog.content}
+            onChange={(e) => setCurrentBlog({ ...currentBlog, content: e.target.value })}
+            fullWidth
+            multiline
+            rows={4}
+            style={{ marginBottom: '10px' }}
+          />
+          <Box>
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              id="blog-image-upload"
+              onChange={handleBlogImageChange}
+            />
+            <label htmlFor="blog-image-upload">
+              <Button variant="outlined" component="span" style={{ marginBottom: '10px' }}>
+                Upload Blog Image
+              </Button>
+            </label>
+            {blogImagePreview && (
+              <img
+                src={blogImagePreview}
+                alt="Preview"
+                style={{ width: '100%', maxHeight: '200px', marginBottom: '10px' }}
+              />
+            )}
+          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveBlog}
+            fullWidth
+          >
+            Save
+          </Button>
+        </Box>
+      </Modal>
+    </Box>
   );
-}
+};
 
-export default UserBlogPosts;
+const styles = {
+  modal: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: '#fff',
+    padding: '20px',
+    borderRadius: '8px',
+    width: '400px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+  },
+};
+
+export default UserBlogManager;
