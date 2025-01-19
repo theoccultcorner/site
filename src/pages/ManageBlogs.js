@@ -52,9 +52,10 @@ function ManageBlogs() {
       onValue(blogsRef, (snapshot) => {
         const data = snapshot.val();
         const userBlogs = data
-          ? Object.entries(data)
-              .map(([key, value]) => ({ id: key, ...value }))
-              .filter((blog) => blog.authorId === userId)
+          ? Object.entries(data).map(([key, value]) => ({
+              id: key,
+              ...value,
+            }))
           : [];
         setBlogs(userBlogs.reverse());
       });
@@ -159,8 +160,13 @@ function ManageBlogs() {
               />
               <CardContent>
                 <Typography variant="h6">{blog.title}</Typography>
-                <Typography variant="body2">{blog.content}</Typography>
-                <Typography variant="caption">
+                <Typography variant="body2" sx={{ marginBottom: "10px" }}>
+                  {blog.content}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {`By: ${blog.authorDisplayName || "Unknown"}`}
+                </Typography>
+                <Typography variant="caption" sx={{ display: "block" }}>
                   {new Date(blog.date).toLocaleString()}
                 </Typography>
                 <Box sx={{ marginTop: "10px" }}>
