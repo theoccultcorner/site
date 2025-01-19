@@ -13,6 +13,7 @@ import {
   IconButton,
   AppBar,
   Toolbar,
+  Divider,
 } from '@mui/material';
 import { auth, db } from '../firebaseConfig';
 import { getDatabase, ref, push, onValue, update, remove } from 'firebase/database';
@@ -152,7 +153,6 @@ const Meta = () => {
         backgroundColor: '#f5f5f5',
       }}
     >
-      {/* AppBar for title */}
       <AppBar position="sticky" sx={{ backgroundColor: '#000000' }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
@@ -161,7 +161,6 @@ const Meta = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Chat messages */}
       <Paper
         ref={chatBoxRef}
         sx={{
@@ -172,48 +171,54 @@ const Meta = () => {
         }}
       >
         <List>
-          {messages.map((message) => (
-            <ListItem key={message.id} sx={{ alignItems: 'flex-start', gap: 2 }}>
-              <ListItemAvatar>
-                <Avatar
-                  src={userProfiles[message.uid]?.avatar || 'https://via.placeholder.com/50'}
-                  alt={userProfiles[message.uid]?.name || 'User'}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {userProfiles[message.uid]?.name || 'Anonymous'}
-                  </Typography>
-                }
-                secondary={
-                  <>
-                    <Typography variant="caption" color="textSecondary">
-                      {formatTimestamp(message.timestamp)}
-                    </Typography>
-                    <Typography variant="body2">{message.text}</Typography>
-                  </>
-                }
-              />
-              <Box>
-                {currentUser && currentUser.uid === message.uid && (
-                  <>
-                    <IconButton onClick={() => handleEdit(message)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(message.id)}>
-                      <Delete />
-                    </IconButton>
-                  </>
-                )}
-                <Likes postId={message.id} user={currentUser} />
-              </Box>
-            </ListItem>
+          {messages.map((message, index) => (
+            <React.Fragment key={message.id}>
+              <ListItem sx={{ alignItems: 'flex-start', gap: 2 }}>
+                <Box>
+                  <ListItemAvatar>
+                    <Avatar
+                      src={userProfiles[message.uid]?.avatar || 'https://via.placeholder.com/50'}
+                      alt={userProfiles[message.uid]?.name || 'User'}
+                    />
+                  </ListItemAvatar>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: 1 }}>
+                    <Likes postId={message.id} user={currentUser} />
+                    {currentUser && currentUser.uid === message.uid && (
+                      <Box sx={{ display: 'flex', gap: 1, marginTop: 1 }}>
+                        <IconButton onClick={() => handleEdit(message)} size="small">
+                          <Edit fontSize="small" />
+                        </IconButton>
+                        <IconButton onClick={() => handleDelete(message.id)} size="small">
+                          <Delete fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <ListItemText
+                    primary={
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        {userProfiles[message.uid]?.name || 'Anonymous'}
+                      </Typography>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="caption" color="textSecondary">
+                          {formatTimestamp(message.timestamp)}
+                        </Typography>
+                        <Typography variant="body2">{message.text}</Typography>
+                      </>
+                    }
+                  />
+                </Box>
+              </ListItem>
+              {index < messages.length - 1 && <Divider />} {/* Add divider between messages */}
+            </React.Fragment>
           ))}
         </List>
       </Paper>
 
-      {/* Input area */}
       <Box
         sx={{
           display: 'flex',
