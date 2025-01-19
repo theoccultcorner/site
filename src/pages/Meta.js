@@ -21,8 +21,9 @@ import {
 } from '@mui/material';
 import { auth, db } from '../firebaseConfig';
 import { getDatabase, ref, push, onValue, update, remove } from 'firebase/database';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, getDoc } from 'firebase/firestore';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, Image, ImageOutlined } from '@mui/icons-material';
 import Likes from './Likes';
 
 const Meta = () => {
@@ -30,13 +31,13 @@ const Meta = () => {
   const [input, setInput] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [editingMessageId, setEditingMessageId] = useState(null);
-  const [userProfiles, setUserProfiles] = useState({});
+  const [imageFile, setImageFile] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState(null);
   const chatBoxRef = useRef(null);
 
   useEffect(() => {
-    const fetchUserData = async (user) => {
+    const fetchCurrentUser = async (user) => {
       if (user) {
         const userRef = doc(db, 'profiles', user.uid);
         const userSnap = await getDoc(userRef);
@@ -63,34 +64,11 @@ const Meta = () => {
             }))
           : [];
         setMessages(loadedMessages);
-        fetchProfiles(loadedMessages);
       });
     };
 
-    const fetchProfiles = async (loadedMessages) => {
-      const profileRefs = Array.from(new Set(loadedMessages.map((msg) => msg.uid)));
-      const profiles = {};
-      await Promise.all(
-        profileRefs.map(async (uid) => {
-          try {
-            const userRef = doc(db, 'profiles', uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-              profiles[uid] = {
-                name: userSnap.data().displayName || 'Anonymous',
-                avatar: userSnap.data().photoURL || 'https://via.placeholder.com/50',
-              };
-            }
-          } catch (error) {
-            console.error(`Error fetching profile for uid: ${uid}`, error);
-          }
-        })
-      );
-      setUserProfiles(profiles);
-    };
-
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      fetchUserData(user);
+      fetchCurrentUser(user);
     });
 
     fetchMessages();
@@ -104,17 +82,30 @@ const Meta = () => {
     }
   }, [messages]);
 
-  const handleSend = () => {
-    if (!currentUser || input.trim() === '') return;
+  const handleSend = async () => {
+    if (!currentUser || (input.trim() === '' && !imageFile)) return;
 
     const db = getDatabase();
     const messagesRef = ref(db, 'messages');
 
+    let imageUrl = null;
+    if (imageFile) {
+      const storage = getStorage();
+      const imageRef = storageRef(storage, `messageImages/${imageFile.name}`);
+      try {
+        const snapshot = await uploadBytes(imageRef, imageFile);
+        imageUrl = await getDownloadURL(snapshot.ref);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
+
     if (editingMessageId) {
       const messageRef = ref(db, `messages/${editingMessageId}`);
-      update(messageRef, { text: input }).then(() => {
+      update(messageRef, { text: input, imageUrl }).then(() => {
         setEditingMessageId(null);
         setInput('');
+        setImageFile(null);
       });
     } else {
       push(messagesRef, {
@@ -123,8 +114,10 @@ const Meta = () => {
         avatar: currentUser.avatar,
         uid: currentUser.uid,
         timestamp: Date.now(),
+        imageUrl,
       });
       setInput('');
+      setImageFile(null);
     }
   };
 
@@ -152,7 +145,11 @@ const Meta = () => {
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && event.shiftKey) {
+      event.preventDefault();
+      setInput((prev) => prev + '\n');
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
       handleSend();
     }
   };
@@ -194,15 +191,15 @@ const Meta = () => {
               <ListItem sx={{ alignItems: 'flex-start', gap: 2 }}>
                 <ListItemAvatar>
                   <Avatar
-                    src={userProfiles[message.uid]?.avatar || 'https://via.placeholder.com/50'}
-                    alt={userProfiles[message.uid]?.name || 'User'}
+                    src={message.avatar || 'https://via.placeholder.com/50'}
+                    alt={message.sender || 'User'}
                   />
                 </ListItemAvatar>
                 <Box sx={{ flexGrow: 1 }}>
                   <ListItemText
                     primary={
                       <Typography variant="subtitle1" fontWeight="bold">
-                        {userProfiles[message.uid]?.name || 'Anonymous'}
+                        {message.sender || 'Anonymous'}
                       </Typography>
                     }
                     secondary={
@@ -210,7 +207,21 @@ const Meta = () => {
                         <Typography variant="caption" color="textSecondary">
                           {formatTimestamp(message.timestamp)}
                         </Typography>
-                        <Typography variant="body2">{message.text}</Typography>
+                        <Typography variant="body2" style={{ whiteSpace: 'pre-line' }}>
+                          {message.text}
+                        </Typography>
+                        {message.imageUrl && (
+                          <img
+                            src={message.imageUrl}
+                            alt="Uploaded content"
+                            style={{
+                              marginTop: '10px',
+                              maxWidth: '100%',
+                              maxHeight: '300px',
+                              borderRadius: '8px',
+                            }}
+                          />
+                        )}
                       </>
                     }
                   />
@@ -254,13 +265,28 @@ const Meta = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          multiline
         />
+        <IconButton
+          component="label"
+          sx={{
+            marginLeft: '10px',
+            color: imageFile ? 'primary.main' : 'inherit', // Highlight when image is uploaded
+          }}
+        >
+          {imageFile ? <Image /> : <ImageOutlined />}
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => setImageFile(e.target.files[0])}
+          />
+        </IconButton>
         <Button variant="contained" color="primary" onClick={handleSend} sx={{ marginLeft: '10px' }}>
           {editingMessageId ? 'Update' : 'Send'}
         </Button>
       </Box>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
         <DialogTitle>Are you sure?</DialogTitle>
         <DialogContent>

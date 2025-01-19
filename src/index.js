@@ -38,7 +38,7 @@ const App = () => {
           <Route path="blogs" element={<Blogs />} />
 
           {/* Profile-related routes */}
-          <Route path="profiles" element={<ProfileList />} /> {/* List of all profiles */}
+          <Route path="profilelist" element={<ProfileList />} /> {/* List of all profiles */}
           <Route path="users/:displayName" element={<UserProfile />} /> {/* View specific user profile */}
           <Route path="blogs/:displayName" element={<ManageBlogs />} /> {/* Manage blogs for a user */}
 
