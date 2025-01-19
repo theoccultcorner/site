@@ -136,7 +136,7 @@ function ManageBlogs() {
 
   return (
     <Box sx={{ padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h6" gutterBottom>
         {displayName}'s Blogs
       </Typography>
       <Button

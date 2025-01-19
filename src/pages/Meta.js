@@ -13,12 +13,17 @@ import {
   IconButton,
   AppBar,
   Toolbar,
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { auth, db } from '../firebaseConfig';
 import { getDatabase, ref, push, onValue, update, remove } from 'firebase/database';
 import { doc, getDoc } from 'firebase/firestore';
 import { Edit, Delete } from '@mui/icons-material';
-import Likes from './Likes'; // Import the updated Likes component
+import Likes from './Likes';
 
 const Meta = () => {
   const [messages, setMessages] = useState([]);
@@ -26,6 +31,8 @@ const Meta = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [userProfiles, setUserProfiles] = useState({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState(null);
   const chatBoxRef = useRef(null);
 
   useEffect(() => {
@@ -126,10 +133,22 @@ const Meta = () => {
     setEditingMessageId(message.id);
   };
 
-  const handleDelete = (messageId) => {
+  const handleOpenDeleteDialog = (messageId) => {
+    setMessageToDelete(messageId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
     const db = getDatabase();
-    const messageRef = ref(db, `messages/${messageId}`);
+    const messageRef = ref(db, `messages/${messageToDelete}`);
     remove(messageRef);
+    setMessageToDelete(null);
+    setDeleteDialogOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setMessageToDelete(null);
+    setDeleteDialogOpen(false);
   };
 
   const handleKeyDown = (event) => {
@@ -152,8 +171,7 @@ const Meta = () => {
         backgroundColor: '#f5f5f5',
       }}
     >
-      {/* AppBar for title */}
-      <AppBar position="sticky" sx={{ backgroundColor: '#6200ea' }}>
+      <AppBar position="sticky" sx={{ backgroundColor: '#000000' }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
             Διαλεκτικὸς Χῶρος (Dialektikós Chōros)
@@ -161,67 +179,72 @@ const Meta = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Chat messages */}
       <Paper
         ref={chatBoxRef}
         sx={{
-          flexGrow: 1,
+          flex: 1,
           overflowY: 'auto',
           backgroundColor: '#ffffff',
-          border: '1px solid #ccc',
-          borderRadius: '0 0 8px 8px',
           padding: '10px',
         }}
       >
         <List>
           {messages.map((message) => (
-            <ListItem key={message.id} sx={{ alignItems: 'flex-start', gap: 2 }}>
-              <ListItemAvatar>
-                <Avatar
-                  src={userProfiles[message.uid]?.avatar || 'https://via.placeholder.com/50'}
-                  alt={userProfiles[message.uid]?.name || 'User'}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {userProfiles[message.uid]?.name || 'Anonymous'}
-                  </Typography>
-                }
-                secondary={
-                  <>
-                    <Typography variant="caption" color="textSecondary">
-                      {formatTimestamp(message.timestamp)}
-                    </Typography>
-                    <Typography variant="body2">{message.text}</Typography>
-                  </>
-                }
-              />
-              <Box>
-                {currentUser && currentUser.uid === message.uid && (
-                  <>
-                    <IconButton onClick={() => handleEdit(message)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(message.id)}>
-                      <Delete />
-                    </IconButton>
-                  </>
-                )}
-                <Likes postId={message.id} user={currentUser} />
-              </Box>
-            </ListItem>
+            <React.Fragment key={message.id}>
+              <ListItem sx={{ alignItems: 'flex-start', gap: 2 }}>
+                <ListItemAvatar>
+                  <Avatar
+                    src={userProfiles[message.uid]?.avatar || 'https://via.placeholder.com/50'}
+                    alt={userProfiles[message.uid]?.name || 'User'}
+                  />
+                </ListItemAvatar>
+                <Box sx={{ flexGrow: 1 }}>
+                  <ListItemText
+                    primary={
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        {userProfiles[message.uid]?.name || 'Anonymous'}
+                      </Typography>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="caption" color="textSecondary">
+                          {formatTimestamp(message.timestamp)}
+                        </Typography>
+                        <Typography variant="body2">{message.text}</Typography>
+                      </>
+                    }
+                  />
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    {currentUser && currentUser.uid === message.uid && (
+                      <>
+                        <IconButton onClick={() => handleEdit(message)}>
+                          <Edit />
+                        </IconButton>
+                        <IconButton onClick={() => handleOpenDeleteDialog(message.id)}>
+                          <Delete />
+                        </IconButton>
+                      </>
+                    )}
+                    <Likes postId={message.id} user={currentUser} />
+                  </Box>
+                </Box>
+              </ListItem>
+              <Divider />
+            </React.Fragment>
           ))}
         </List>
       </Paper>
 
-      {/* Input area */}
       <Box
         sx={{
           display: 'flex',
+          alignItems: 'center',
           padding: '10px',
           backgroundColor: '#ffffff',
           borderTop: '1px solid #ccc',
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 10,
         }}
       >
         <TextField
@@ -236,6 +259,20 @@ const Meta = () => {
           {editingMessageId ? 'Update' : 'Send'}
         </Button>
       </Box>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
+        <DialogTitle>Are you sure?</DialogTitle>
+        <DialogContent>
+          <Typography>Do you really want to delete this message?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>No</Button>
+          <Button onClick={handleConfirmDelete} color="error">
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
