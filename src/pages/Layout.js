@@ -10,6 +10,7 @@ import {
   Avatar,
   Tooltip,
   Box,
+  useMediaQuery,
 } from "@mui/material";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
@@ -26,8 +27,10 @@ import { db } from "../firebaseConfig";
 const Layout = () => {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [subMenuEl, setSubMenuEl] = useState(null);
   const navigate = useNavigate();
+
+  // Check for mobile screen size
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -74,13 +77,8 @@ const Layout = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleSubMenu = (event) => {
-    setSubMenuEl(event.currentTarget);
-  };
-
   const handleClose = () => {
     setAnchorEl(null);
-    setSubMenuEl(null);
   };
 
   const navigateTo = (path) => {
@@ -102,7 +100,18 @@ const Layout = () => {
           </Typography>
 
           {user ? (
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              {isMobile && (
+                <Typography variant="body2" color="inherit">
+                  Menu
+                </Typography>
+              )}
               <Tooltip title="Click to access the menu" placement="bottom">
                 <IconButton
                   size="large"
@@ -141,7 +150,6 @@ const Layout = () => {
                 <MenuItem onClick={() => navigateTo("/profiles")}>
                   Community
                 </MenuItem>
-                <MenuItem onClick={handleSubMenu}>Seminary</MenuItem>
                 <MenuItem onClick={() => navigateTo("/meta")}>
                   Διαλεκτικὸς Χῶρος
                 </MenuItem>
@@ -150,47 +158,6 @@ const Layout = () => {
                   Contact
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
-              </Menu>
-
-              <Menu
-                id="sub-menu"
-                anchorEl={subMenuEl}
-                open={Boolean(subMenuEl)}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                <MenuItem onClick={() => navigateTo("/seminary")}>
-                  Seminary Home
-                </MenuItem>
-                <MenuItem onClick={() => navigateTo("/seminary/formation")}>
-                  Formation
-                </MenuItem>
-                <MenuItem onClick={() => navigateTo("/seminary/requirements")}>
-                  Requirements
-                </MenuItem>
-                <MenuItem onClick={() => navigateTo("/seminary/foundations")}>
-                  Foundations
-                </MenuItem>
-                <MenuItem
-                  onClick={() => navigateTo("/seminary/certificateprograms")}
-                >
-                  Certificate Programs
-                </MenuItem>
-                <MenuItem onClick={() => navigateTo("/seminary/ministry")}>
-                  Ministry Degrees
-                </MenuItem>
-                <MenuItem
-                  onClick={() => navigateTo("/seminary/accreditation")}
-                >
-                  Accreditation
-                </MenuItem>
               </Menu>
             </Box>
           ) : (
