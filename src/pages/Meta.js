@@ -156,7 +156,7 @@ const Meta = () => {
       <AppBar position="sticky" sx={{ backgroundColor: '#000000' }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-            Διαλεκτικὸς Χῶρος (Dialektikós Chōros)
+            Διαλεκτικὸς (Dialektikós)
           </Typography>
         </Toolbar>
       </AppBar>
