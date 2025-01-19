@@ -18,7 +18,7 @@ import { auth, db } from '../firebaseConfig';
 import { getDatabase, ref, push, onValue, update, remove } from 'firebase/database';
 import { doc, getDoc } from 'firebase/firestore';
 import { Edit, Delete } from '@mui/icons-material';
-import Likes from './Likes'; // Import the updated Likes component
+import Likes from './Likes';
 
 const Meta = () => {
   const [messages, setMessages] = useState([]);
@@ -165,11 +165,9 @@ const Meta = () => {
       <Paper
         ref={chatBoxRef}
         sx={{
-          flexGrow: 1,
+          flex: 1,
           overflowY: 'auto',
           backgroundColor: '#ffffff',
-          border: '1px solid #ccc',
-          borderRadius: '0 0 8px 8px',
           padding: '10px',
         }}
       >
@@ -219,9 +217,13 @@ const Meta = () => {
       <Box
         sx={{
           display: 'flex',
+          alignItems: 'center',
           padding: '10px',
           backgroundColor: '#ffffff',
           borderTop: '1px solid #ccc',
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 10,
         }}
       >
         <TextField
