@@ -1,8 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import {
+  IconButton,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button, // Add this import
+} from '@mui/material';
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import { getDatabase, ref, set, onValue, get } from 'firebase/database';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+
 
 const Likes = ({ postId, user }) => {
   const [liked, setLiked] = useState(false);
@@ -18,13 +32,11 @@ const Likes = ({ postId, user }) => {
     await Promise.all(
       userIds.map(async (userId) => {
         try {
-          const userRef = doc(db, 'profiles', userId); // Ensure the Firestore path is correct
+          const userRef = doc(db, 'profiles', userId);
           const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            userNamesObj[userId] = userSnap.data().displayName || 'Anonymous';
-          } else {
-            userNamesObj[userId] = 'Anonymous';
-          }
+          userNamesObj[userId] = userSnap.exists()
+            ? userSnap.data().displayName || 'Anonymous'
+            : 'Anonymous';
         } catch (error) {
           console.error(`Error fetching displayName for userId: ${userId}`, error);
           userNamesObj[userId] = 'Anonymous';
@@ -48,7 +60,7 @@ const Likes = ({ postId, user }) => {
         setLikesCount(likerIds.length);
         setLiked(!!likes[user.uid]);
         setLikers(likerIds);
-        fetchUserNames(likerIds); // Fetch usernames of the likers
+        fetchUserNames(likerIds);
       } else {
         setLikesCount(0);
         setLiked(false);
@@ -82,9 +94,22 @@ const Likes = ({ postId, user }) => {
   };
 
   return (
-    <div>
-      <Button onClick={handleLike}>{liked ? 'Unlike' : 'Like'} ({likesCount})</Button>
-      <Button onClick={handleOpen}>Likers ({likesCount})</Button>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {/* Like Button */}
+      <IconButton onClick={handleLike} color={liked ? 'primary' : 'default'}>
+        {liked ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
+      </IconButton>
+
+      {/* Likes Count */}
+      <Typography
+        variant="body2"
+        onClick={handleOpen}
+        style={{ cursor: 'pointer', color: '#1976d2', fontWeight: 'bold' }}
+      >
+        {likesCount}
+      </Typography>
+
+      {/* Likers Dialog */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Likers</DialogTitle>
         <DialogContent>
