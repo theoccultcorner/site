@@ -1,9 +1,4 @@
-import React, { useState } from 'react';
-import { Modal, Box, TextField, Button, Typography } from '@mui/material';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getDatabase, ref, push, update } from 'firebase/database';
-
-const BlogModal = ({ open, onClose, userId, selectedBlog, onBlogSave }) => {
+const BlogModal = ({ open, onClose, userId, selectedBlog, onBlogSave, displayName }) => {
   const [title, setTitle] = useState(selectedBlog?.title || '');
   const [content, setContent] = useState(selectedBlog?.content || '');
   const [imageFile, setImageFile] = useState(null);
@@ -35,6 +30,7 @@ const BlogModal = ({ open, onClose, userId, selectedBlog, onBlogSave }) => {
       content: content.trim(),
       imageUrl,
       date: new Date().toISOString(),
+      author: displayName || 'Anonymous',
     };
 
     const db = getDatabase();
@@ -44,7 +40,7 @@ const BlogModal = ({ open, onClose, userId, selectedBlog, onBlogSave }) => {
       } else {
         await push(ref(db, `blogPosts/${userId}`), blogData);
       }
-      onBlogSave(); // Notify parent to refresh blogs
+      onBlogSave();
     } catch (error) {
       console.error('Error saving blog:', error);
     } finally {

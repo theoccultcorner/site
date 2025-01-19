@@ -44,7 +44,7 @@ function ManageBlogs() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [blogToDelete, setBlogToDelete] = useState(null);
 
-  // Fetch user-specific blogs
+  // Fetch blogs created by the user
   useEffect(() => {
     const fetchUserBlogs = () => {
       const db = getDatabase();
@@ -52,10 +52,12 @@ function ManageBlogs() {
       onValue(blogsRef, (snapshot) => {
         const data = snapshot.val();
         const userBlogs = data
-          ? Object.entries(data).map(([key, value]) => ({
-              id: key,
-              ...value,
-            }))
+          ? Object.entries(data)
+              .map(([key, value]) => ({
+                id: key,
+                ...value,
+              }))
+              .filter((blog) => blog.authorId === userId) // Only fetch blogs created by the user
           : [];
         setBlogs(userBlogs.reverse());
       });
@@ -90,7 +92,7 @@ function ManageBlogs() {
       content: blogContent,
       imageUrl: blogImageUrl || "https://via.placeholder.com/150",
       authorId: userId,
-      authorDisplayName: displayName,
+      authorDisplayName: displayName || "Unknown Author", // Ensure displayName is provided
       date: new Date().toISOString(),
     };
 
@@ -164,7 +166,7 @@ function ManageBlogs() {
                   {blog.content}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {`By: ${blog.authorDisplayName || "Unknown"}`}
+                  {`By: ${blog.authorDisplayName || "Unknown Author"}`}
                 </Typography>
                 <Typography variant="caption" sx={{ display: "block" }}>
                   {new Date(blog.date).toLocaleString()}
