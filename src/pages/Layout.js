@@ -8,6 +8,8 @@ import {
   Menu,
   MenuItem,
   Avatar,
+  Tooltip,
+  Box,
 } from "@mui/material";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
@@ -98,24 +100,28 @@ const Layout = () => {
           >
             The Gnostic Union
           </Typography>
+
           {user ? (
-            <div>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleMenu}
-                color="inherit"
-              >
-                {user.photoURL ? (
-                  <Avatar src={user.photoURL} alt={user.displayName} />
-                ) : (
-                  <Avatar>
-                    {user.displayName ? user.displayName.charAt(0) : ""}
-                  </Avatar>
-                )}
-              </IconButton>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Tooltip title="Click to access the menu" placement="bottom">
+                <IconButton
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleMenu}
+                  color="inherit"
+                  style={{ position: "relative" }}
+                >
+                  {user.photoURL ? (
+                    <Avatar src={user.photoURL} alt={user.displayName} />
+                  ) : (
+                    <Avatar>
+                      {user.displayName ? user.displayName.charAt(0) : ""}
+                    </Avatar>
+                  )}
+                </IconButton>
+              </Tooltip>
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
@@ -132,7 +138,6 @@ const Layout = () => {
                 onClose={handleClose}
               >
                 <MenuItem onClick={() => navigateTo("/about")}>About</MenuItem>
-                
                 <MenuItem onClick={() => navigateTo("/profiles")}>
                   Community
                 </MenuItem>
@@ -181,14 +186,13 @@ const Layout = () => {
                 <MenuItem onClick={() => navigateTo("/seminary/ministry")}>
                   Ministry Degrees
                 </MenuItem>
-               
                 <MenuItem
                   onClick={() => navigateTo("/seminary/accreditation")}
                 >
                   Accreditation
                 </MenuItem>
               </Menu>
-            </div>
+            </Box>
           ) : (
             <Button color="inherit" onClick={handleLogin}>
               Login
