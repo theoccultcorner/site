@@ -11,6 +11,8 @@ import {
   ListItemText,
   Paper,
   IconButton,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
 import { auth, db } from '../firebaseConfig';
 import { getDatabase, ref, push, onValue, update, remove } from 'firebase/database';
@@ -146,33 +148,34 @@ const Meta = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
         height: '100vh',
         backgroundColor: '#f5f5f5',
-        padding: '20px',
       }}
     >
-      <Typography variant="h4" gutterBottom>
-        Διαλεκτικὸς Χῶρος (Dialektikós Chōros)
-      </Typography>
+      {/* AppBar for title */}
+      <AppBar position="sticky" sx={{ backgroundColor: '#000000' }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
+            Διαλεκτικὸς Χῶρος (Dialektikós Chōros)
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      {/* Chat messages */}
       <Paper
         ref={chatBoxRef}
         sx={{
-          width: '100%',
-          maxWidth: 600,
-          height: 500,
+          flexGrow: 1,
           overflowY: 'auto',
           backgroundColor: '#ffffff',
           border: '1px solid #ccc',
-          borderRadius: '8px',
+          borderRadius: '0 0 8px 8px',
           padding: '10px',
-          marginBottom: '20px',
         }}
       >
         <List>
           {messages.map((message) => (
-            <ListItem key={message.id} sx={{ alignItems: 'flex-start' }}>
+            <ListItem key={message.id} sx={{ alignItems: 'flex-start', gap: 2 }}>
               <ListItemAvatar>
                 <Avatar
                   src={userProfiles[message.uid]?.avatar || 'https://via.placeholder.com/50'}
@@ -181,18 +184,20 @@ const Meta = () => {
               </ListItemAvatar>
               <ListItemText
                 primary={
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {userProfiles[message.uid]?.name || 'Anonymous'}
+                  </Typography>
+                }
+                secondary={
                   <>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      {userProfiles[message.uid]?.name || 'Anonymous'}
-                    </Typography>
                     <Typography variant="caption" color="textSecondary">
                       {formatTimestamp(message.timestamp)}
                     </Typography>
+                    <Typography variant="body2">{message.text}</Typography>
                   </>
                 }
-                secondary={message.text}
               />
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Box>
                 {currentUser && currentUser.uid === message.uid && (
                   <>
                     <IconButton onClick={() => handleEdit(message)}>
@@ -203,14 +208,22 @@ const Meta = () => {
                     </IconButton>
                   </>
                 )}
-                {/* Add Likes component */}
                 <Likes postId={message.id} user={currentUser} />
               </Box>
             </ListItem>
           ))}
         </List>
       </Paper>
-      <Box sx={{ display: 'flex', gap: '10px', width: '100%', maxWidth: 600 }}>
+
+      {/* Input area */}
+      <Box
+        sx={{
+          display: 'flex',
+          padding: '10px',
+          backgroundColor: '#ffffff',
+          borderTop: '1px solid #ccc',
+        }}
+      >
         <TextField
           fullWidth
           variant="outlined"
@@ -219,7 +232,7 @@ const Meta = () => {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <Button variant="contained" color="primary" onClick={handleSend}>
+        <Button variant="contained" color="primary" onClick={handleSend} sx={{ marginLeft: '10px' }}>
           {editingMessageId ? 'Update' : 'Send'}
         </Button>
       </Box>

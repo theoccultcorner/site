@@ -24,6 +24,10 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 
 function ManageBlogs() {
@@ -37,6 +41,8 @@ function ManageBlogs() {
   const [blogContent, setBlogContent] = useState("");
   const [blogImageFile, setBlogImageFile] = useState(null);
   const [selectedBlog, setSelectedBlog] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [blogToDelete, setBlogToDelete] = useState(null);
 
   // Fetch user-specific blogs
   useEffect(() => {
@@ -99,11 +105,21 @@ function ManageBlogs() {
     }
   };
 
-  // Handle blog deletion
-  const handleDeleteBlog = async (blogId) => {
+  // Open delete confirmation dialog
+  const handleOpenDeleteDialog = (blog) => {
+    setBlogToDelete(blog);
+    setDeleteDialogOpen(true);
+  };
+
+  // Confirm blog deletion
+  const handleDeleteBlog = async () => {
     const db = getDatabase();
     try {
-      await remove(ref(db, `blogPosts/${blogId}`));
+      if (blogToDelete) {
+        await remove(ref(db, `blogPosts/${blogToDelete.id}`));
+        setDeleteDialogOpen(false);
+        setBlogToDelete(null);
+      }
     } catch (error) {
       console.error("Error deleting blog:", error);
     }
@@ -164,7 +180,7 @@ function ManageBlogs() {
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() => handleDeleteBlog(blog.id)}
+                    onClick={() => handleOpenDeleteDialog(blog)}
                   >
                     Delete
                   </Button>
@@ -221,6 +237,24 @@ function ManageBlogs() {
           </Button>
         </Box>
       </Modal>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Delete Blog</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this blog?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteBlog} color="error">
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
