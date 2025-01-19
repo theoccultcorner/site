@@ -57,7 +57,8 @@ const Layout = () => {
         });
       }
 
-      navigate("/profile");
+      // Navigate directly to the About page after login
+      navigate("/about");
     } catch (error) {
       console.error("Error occurred during login:", error);
     }
@@ -147,9 +148,6 @@ const Layout = () => {
                 onClose={handleClose}
               >
                 <MenuItem onClick={() => navigateTo("/about")}>About</MenuItem>
-                <MenuItem onClick={() => navigateTo("/profiles")}>
-                  Community
-                </MenuItem>
                 <MenuItem onClick={() => navigateTo("/meta")}>
                   Διαλεκτικὸς Χῶρος
                 </MenuItem>
