@@ -1,32 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { collection, getDocs, doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { db, auth } from '../firebaseConfig';
-import { Avatar, Typography, Grid, Paper } from '@mui/material';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import {
+  collection,
+  getDocs,
+  doc,
+  onSnapshot,
+  setDoc,
+} from "firebase/firestore";
+import { db, auth } from "../firebaseConfig";
+import {
+  Avatar,
+  Typography,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Paper,
+  Button,
+  Collapse,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { useNavigate } from "react-router-dom";
 
 function ProfileList() {
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState({});
+  const [expandedProfile, setExpandedProfile] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const navigate = useNavigate();
 
+  // Fetch profiles and track online users
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'profiles'));
+        const querySnapshot = await getDocs(collection(db, "profiles"));
         const fetchedProfiles = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setProfiles(fetchedProfiles);
       } catch (error) {
-        console.error('Error fetching profiles:', error);
+        console.error("Error fetching profiles:", error);
       } finally {
         setLoading(false);
       }
     };
 
     const trackOnlineUsers = () => {
-      const onlineRef = collection(db, 'onlineUsers');
+      const onlineRef = collection(db, "onlineUsers");
       const unsubscribe = onSnapshot(onlineRef, (snapshot) => {
         const onlineData = {};
         snapshot.forEach((doc) => {
@@ -41,19 +63,21 @@ function ProfileList() {
     fetchProfiles();
     const unsubscribeOnlineUsers = trackOnlineUsers();
 
-    return () => unsubscribeOnlineUsers(); // Cleanup listener on component unmount
+    return () => unsubscribeOnlineUsers();
   }, []);
 
   useEffect(() => {
     const updateOnlineStatus = async (isOnline) => {
       if (!auth.currentUser) return;
-      const userRef = doc(db, 'onlineUsers', auth.currentUser.uid);
+      setCurrentUserId(auth.currentUser.uid);
+
+      const userRef = doc(db, "onlineUsers", auth.currentUser.uid);
       if (isOnline) {
         await setDoc(
           userRef,
           {
-            displayName: auth.currentUser.displayName || 'Anonymous',
-            photoURL: auth.currentUser.photoURL || '',
+            displayName: auth.currentUser.displayName || "Anonymous",
+            photoURL: auth.currentUser.photoURL || "",
             online: true,
             lastActive: new Date().toISOString(),
           },
@@ -74,76 +98,133 @@ function ProfileList() {
     const handleOnline = () => updateOnlineStatus(true);
     const handleOffline = () => updateOnlineStatus(false);
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    handleOnline(); // Set online status when the component mounts
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    handleOnline();
 
     return () => {
-      handleOffline(); // Set offline status when the component unmounts
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      handleOffline();
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
-  const sanitizeDisplayName = (name) =>
-    name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9()]/g, ''); // Remove spaces and special characters
+  const handleExpand = (profileId) => {
+    setExpandedProfile(expandedProfile === profileId ? null : profileId);
+  };
+
+  const handleManageBlogs = (profile) => {
+    if (profile.id === currentUserId) {
+      navigate(`/blogs/${profile.displayName}`, { state: { userId: profile.id } });
+    } else {
+      alert("You can only manage your own blogs!");
+    }
+  };
 
   if (loading) {
-    return <Typography variant="h6" align="center">Loading...</Typography>;
+    return (
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <Typography variant="h6">Loading...</Typography>
+      </div>
+    );
   }
 
   return (
-    <Grid container spacing={3} sx={{ padding: '20px' }}>
-      {profiles.map((profile) => {
-        const isOnline = onlineUsers[profile.id]?.online || false;
+    <Paper
+      elevation={3}
+      style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
+    >
+      <Typography variant="h5" gutterBottom>
+        The Community
+      </Typography>
+      <List>
+        {profiles.map((profile) => {
+          const isOnline = onlineUsers[profile.id]?.online || false;
 
-        return (
-          <Grid item xs={12} sm={6} md={4} key={profile.id}>
-            <Paper elevation={3} sx={{ padding: '20px', textAlign: 'center' }}>
-              <Link
-                to={`/users/${sanitizeDisplayName(profile.displayName)}`}
-                style={{ textDecoration: 'none', color: 'inherit' }}
+          return (
+            <div key={profile.id}>
+              <ListItem
+                button
+                onClick={() => handleExpand(profile.id)}
+                style={{ borderBottom: "1px solid #eee", cursor: "pointer" }}
               >
-                <Avatar
-                  src={profile.photoURL}
-                  alt={profile.displayName}
-                  sx={{ width: 80, height: 80, margin: '0 auto', marginBottom: '10px' }}
+                <ListItemAvatar>
+                  <Avatar src={profile.photoURL} alt={profile.displayName}>
+                    {profile.photoURL ? "" : profile.displayName.charAt(0).toUpperCase()}
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Typography variant="h6" component="span">
+                      {profile.displayName}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      color={isOnline ? "green" : "textSecondary"}
+                    >
+                      {isOnline ? "Online" : "Offline"}
+                    </Typography>
+                  }
                 />
-                <Typography variant="h6" gutterBottom>
-                  {profile.displayName}
-                </Typography>
-              </Link>
-              <Typography variant="body1" sx={{ color: isOnline ? 'green' : 'gray' }}>
-                {isOnline ? 'Online' : 'Offline'}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Email:</strong>{' '}
-                {profile.email ? (
-                  <a href={`mailto:${profile.email}`} style={{ color: 'inherit' }}>
-                    {profile.email}
-                  </a>
+                {expandedProfile === profile.id ? (
+                  <ExpandLessIcon />
                 ) : (
-                  'Not provided'
+                  <ExpandMoreIcon />
                 )}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Bio:</strong> {profile.bio || 'No bio available'}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Website:</strong>{' '}
-                {profile.website ? (
-                  <a href={profile.website} target="_blank" rel="noopener noreferrer">
-                    {profile.website}
-                  </a>
-                ) : (
-                  'Not provided'
-                )}
-              </Typography>
-            </Paper>
-          </Grid>
-        );
-      })}
-    </Grid>
+              </ListItem>
+              <Collapse
+                in={expandedProfile === profile.id}
+                timeout="auto"
+                unmountOnExit
+              >
+                <div style={{ paddingLeft: "20px", paddingBottom: "10px" }}>
+                  <Typography variant="body2">
+                    <strong>Bio:</strong> {profile.bio || "No bio available"}
+                  </Typography>
+                  {profile.email && (
+                    <Typography variant="body2">
+                      <strong>Email:</strong>{" "}
+                      <a
+                        href={`mailto:${profile.email}`}
+                        style={{ color: "#1976d2" }}
+                      >
+                        {profile.email}
+                      </a>
+                    </Typography>
+                  )}
+                  {profile.website && (
+                    <Typography variant="body2">
+                      <strong>Website:</strong>{" "}
+                      <a
+                        href={profile.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: "#1976d2" }}
+                      >
+                        {profile.website}
+                      </a>
+                    </Typography>
+                  )}
+                  {currentUserId === profile.id && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleManageBlogs(profile)}
+                      style={{ marginTop: "10px" }}
+                    >
+                      Manage Blogs
+                    </Button>
+                  )}
+                </div>
+              </Collapse>
+            </div>
+          );
+        })}
+      </List>
+    </Paper>
   );
 }
 

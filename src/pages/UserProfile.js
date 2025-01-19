@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
+import { getDatabase, ref, onValue } from 'firebase/database';
 import { db } from '../firebaseConfig';
-import { Avatar, Typography, Paper, Box } from '@mui/material';
+import { Avatar, Typography, Paper, Box, Grid, Card, CardContent, CardMedia } from '@mui/material';
 
 function UserProfile() {
   const { displayName } = useParams(); // Get displayName from URL
   const [user, setUser] = useState(null);
+  const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const sanitizeDisplayName = (name) =>
     name.replace(/\s+/g, '').replace(/[^a-zA-Z0-9()]/g, ''); // Same sanitization logic
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndBlogs = async () => {
       try {
+        // Fetch user profile
         const querySnapshot = await getDocs(collection(db, 'profiles'));
         const sanitizedDisplayName = sanitizeDisplayName(displayName);
         const matchingProfile = querySnapshot.docs
@@ -23,17 +26,32 @@ function UserProfile() {
 
         if (matchingProfile) {
           setUser(matchingProfile);
+
+          // Fetch blogs associated with the user
+          const db = getDatabase();
+          const blogsRef = ref(db, 'blogPosts');
+          onValue(blogsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              const userBlogs = Object.entries(data)
+                .map(([key, value]) => ({ id: key, ...value }))
+                .filter((blog) => blog.authorId === matchingProfile.id);
+              setBlogs(userBlogs.reverse());
+            } else {
+              setBlogs([]);
+            }
+          });
         } else {
           console.error('User not found');
         }
       } catch (error) {
-        console.error('Error fetching user profile:', error);
+        console.error('Error fetching user profile or blogs:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
+    fetchUserAndBlogs();
   }, [displayName]);
 
   if (loading) {
@@ -46,6 +64,7 @@ function UserProfile() {
 
   return (
     <Paper style={styles.paper}>
+      {/* User Profile Section */}
       <Box style={styles.profileHeader}>
         <Avatar
           src={user.photoURL}
@@ -99,6 +118,40 @@ function UserProfile() {
           </Box>
         )}
       </Box>
+
+      {/* User Blogs Section */}
+      <Box>
+        <Typography variant="h6" style={{ marginTop: '20px', marginBottom: '10px' }}>
+          {user.displayName}'s Blogs
+        </Typography>
+        <Grid container spacing={3}>
+          {blogs.length === 0 ? (
+            <Typography>No blogs found.</Typography>
+          ) : (
+            blogs.map((blog) => (
+              <Grid item xs={12} sm={6} md={4} key={blog.id}>
+                <Card>
+                  {blog.imageUrl && (
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={blog.imageUrl}
+                      alt={blog.title}
+                    />
+                  )}
+                  <CardContent>
+                    <Typography variant="h6">{blog.title}</Typography>
+                    <Typography variant="body2">{blog.content}</Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {new Date(blog.date).toLocaleString()}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          )}
+        </Grid>
+      </Box>
     </Paper>
   );
 }
@@ -106,7 +159,7 @@ function UserProfile() {
 const styles = {
   paper: {
     padding: '20px',
-    maxWidth: '600px',
+    maxWidth: '800px',
     margin: 'auto',
     marginTop: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',

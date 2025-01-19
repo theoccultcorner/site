@@ -132,9 +132,7 @@ const Layout = () => {
                 onClose={handleClose}
               >
                 <MenuItem onClick={() => navigateTo("/about")}>About</MenuItem>
-                <MenuItem onClick={() => navigateTo("/profile")}>
-                  Profile
-                </MenuItem>
+                
                 <MenuItem onClick={() => navigateTo("/profiles")}>
                   Community
                 </MenuItem>

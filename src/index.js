@@ -8,9 +8,10 @@ import About from "./pages/About";
 import Seminary from "./pages/Seminary/Seminary";
 import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
-import Profile from "./pages/Profile"; // Current user's profile
+
 import ProfileList from "./pages/ProfileList"; // List of all profiles
 import UserProfile from "./pages/UserProfile"; // Specific user profile
+import ManageBlogs from "./pages/ManageBlogs"; // Manage blogs page
 import Meta from "./pages/Meta";
 import Formation from "./pages/Seminary/Formation";
 import Requirements from "./pages/Seminary/Requirements";
@@ -37,9 +38,9 @@ const App = () => {
           <Route path="blogs" element={<Blogs />} />
 
           {/* Profile-related routes */}
-          <Route path="profile" element={<Profile />} /> {/* Current user's profile */}
           <Route path="profiles" element={<ProfileList />} /> {/* List of all profiles */}
           <Route path="users/:displayName" element={<UserProfile />} /> {/* View specific user profile */}
+          <Route path="blogs/:displayName" element={<ManageBlogs />} /> {/* Manage blogs for a user */}
 
           {/* Seminary-related routes */}
           <Route path="seminary" element={<Seminary />} />
