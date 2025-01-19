@@ -30,6 +30,10 @@ function ProfileList() {
   const [currentUserId, setCurrentUserId] = useState(null);
   const navigate = useNavigate();
 
+  // Sanitize display name
+  const sanitizeDisplayName = (name) =>
+    name.replace(/\s+/g, "").replace(/[^a-zA-Z0-9()]/g, "");
+
   // Fetch profiles and track online users
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -66,6 +70,7 @@ function ProfileList() {
     return () => unsubscribeOnlineUsers();
   }, []);
 
+  // Track current user's online status
   useEffect(() => {
     const updateOnlineStatus = async (isOnline) => {
       if (!auth.currentUser) return;
@@ -115,7 +120,8 @@ function ProfileList() {
 
   const handleManageBlogs = (profile) => {
     if (profile.id === currentUserId) {
-      navigate(`/blogs/${profile.displayName}`, { state: { userId: profile.id } });
+      const sanitizedName = sanitizeDisplayName(profile.displayName);
+      navigate(`/blogs/${sanitizedName}`, { state: { userId: profile.id } });
     } else {
       alert("You can only manage your own blogs!");
     }
@@ -135,7 +141,7 @@ function ProfileList() {
       style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
     >
       <Typography variant="h5" gutterBottom>
-        The Community
+        The Union Community
       </Typography>
       <List>
         {profiles.map((profile) => {
