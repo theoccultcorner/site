@@ -1,43 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import "aframe";
-import { getDatabase, ref, set, onValue } from "firebase/database";
-import Cathedral from "./Cathedral";
-import Lighting from "./Lighting";
 import SimplePeer from "simple-peer";
 import { io } from "socket.io-client";
 
 const VirtualWorld = () => {
   const [position, setPosition] = useState({ x: 0, y: 1.6, z: 0 }); // User's position
-  const [others, setOthers] = useState({}); // Other users
-  const [peers, setPeers] = useState({}); // WebRTC peers
-  const [isTalking, setIsTalking] = useState(false); // Voice chat state
-  const userId = "uniqueUserId"; // Replace with a real unique user ID
-  const socket = useRef(null); // Socket reference
-  const userAudioStream = useRef(null); // Local audio stream
+  const [others, setOthers] = useState({});
+  const [peers, setPeers] = useState({});
+  const [isTalking, setIsTalking] = useState(false);
+  const socket = useRef(null);
+  const userAudioStream = useRef(null);
+  const userId = "uniqueUserId"; // Replace with a unique user ID
 
-  // Initialize socket connection
   useEffect(() => {
-    socket.current = io("http://localhost:3000"); // Replace with your signaling server URL
-
-    const handleReceiveOffer = async ({ sdp, sender }) => {
-      const peer = new SimplePeer({ initiator: false, trickle: false });
-      peer.signal(sdp);
-      peer.on("signal", (data) => {
-        socket.current.emit("answer", { sdp: data, target: sender });
-      });
-      peer.on("stream", (stream) => {
-        playAudioStream(stream, sender);
-      });
-      setPeers((prev) => ({ ...prev, [sender]: peer }));
-    };
-
-    const handleReceiveAnswer = ({ sdp, sender }) => {
-      peers[sender]?.signal(sdp);
-    };
-
-    const handleReceiveIceCandidate = ({ candidate, sender }) => {
-      peers[sender]?.signal(candidate);
-    };
+    socket.current = io("https://your-signaling-server.onrender.com"); // Update with Render URL
 
     socket.current.on("offer", handleReceiveOffer);
     socket.current.on("answer", handleReceiveAnswer);
@@ -46,36 +22,32 @@ const VirtualWorld = () => {
     return () => {
       socket.current.disconnect();
     };
-  }, [peers]); // Include dependencies to avoid stale closures
+  }, []);
 
-  // Sync user position with Firebase and listen to others
-  useEffect(() => {
-    const db = getDatabase();
-    const userRef = ref(db, `users/${userId}`);
-    const othersRef = ref(db, "users");
+  const handleReceiveOffer = async ({ sdp, sender }) => {
+    const peer = createPeer(false, sender);
+    peer.signal(sdp);
+  };
 
-    set(userRef, position);
+  const handleReceiveAnswer = ({ sdp, sender }) => {
+    peers[sender]?.signal(sdp);
+  };
 
-    const unsubscribe = onValue(othersRef, (snapshot) => {
-      const data = snapshot.val();
-      setOthers(data || {});
+  const handleReceiveIceCandidate = ({ candidate, sender }) => {
+    peers[sender]?.signal(candidate);
+  };
+
+  const createPeer = (initiator, targetId) => {
+    const peer = new SimplePeer({ initiator, trickle: false, stream: userAudioStream.current });
+    peer.on("signal", (data) => {
+      const type = initiator ? "offer" : "answer";
+      socket.current.emit(type, { sdp: data, target: targetId });
     });
-
-    return () => {
-      set(userRef, null);
-      unsubscribe();
-    };
-  }, [position]);
-
-  const move = (direction) => {
-    setPosition((prev) => {
-      const newPosition = { ...prev };
-      if (direction === "forward") newPosition.z -= 0.5;
-      if (direction === "backward") newPosition.z += 0.5;
-      if (direction === "left") newPosition.x -= 0.5;
-      if (direction === "right") newPosition.x += 0.5;
-      return newPosition;
+    peer.on("stream", (remoteStream) => {
+      playAudioStream(remoteStream, targetId);
     });
+    setPeers((prev) => ({ ...prev, [targetId]: peer }));
+    return peer;
   };
 
   const handleVoiceStart = useCallback(async () => {
@@ -85,14 +57,7 @@ const VirtualWorld = () => {
 
     Object.keys(others).forEach((otherId) => {
       if (otherId !== userId) {
-        const peer = new SimplePeer({ initiator: true, trickle: false, stream });
-        peer.on("signal", (data) => {
-          socket.current.emit("offer", { sdp: data, target: otherId });
-        });
-        peer.on("stream", (remoteStream) => {
-          playAudioStream(remoteStream, otherId);
-        });
-        setPeers((prev) => ({ ...prev, [otherId]: peer }));
+        createPeer(true, otherId);
       }
     });
   }, [others]);
@@ -116,30 +81,36 @@ const VirtualWorld = () => {
 
   return (
     <div>
-      <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-        <button onMouseDown={handleVoiceStart} onMouseUp={handleVoiceStop}>
-          {isTalking ? "Talking..." : "Talk"}
-        </button>
-      </div>
+      <button
+        onMouseDown={handleVoiceStart}
+        onMouseUp={handleVoiceStop}
+        style={{
+          backgroundColor: isTalking ? "red" : "blue",
+          color: "white",
+          padding: "10px",
+          borderRadius: "5px",
+        }}
+      >
+        {isTalking ? "Talking..." : "Talk"}
+      </button>
 
       <a-scene embedded style={{ width: "100%", height: "100vh" }}>
-        <Lighting />
-        <Cathedral />
         <a-entity
-          gltf-model="https://cdn.aframe.io/test-models/models/gltf/kart.glb"
-          position={`${position.x} ${position.y - 1.6} ${position.z}`}
-          animation-mixer
-          scale="0.5 0.5 0.5"
+          geometry="primitive: sphere; radius: 0.5"
+          material="color: blue"
+          position={`${position.x} ${position.y} ${position.z}`}
         ></a-entity>
+
         {Object.entries(others).map(([key, otherPosition]) => (
           <a-entity
             key={key}
-            gltf-model="https://cdn.aframe.io/test-models/models/gltf/kart.glb"
-            position={`${otherPosition.x} ${otherPosition.y - 1.6} ${otherPosition.z}`}
-            animation-mixer
-            scale="0.5 0.5 0.5"
+            geometry="primitive: sphere; radius: 0.5"
+            material="color: red"
+            position={`${otherPosition.x} ${otherPosition.y} ${otherPosition.z}`}
           ></a-entity>
         ))}
+
+        <a-sky color="#ECECEC"></a-sky>
       </a-scene>
     </div>
   );
