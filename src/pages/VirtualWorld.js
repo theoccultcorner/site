@@ -3,7 +3,8 @@ import "aframe";
 import { getDatabase, ref, set, onValue } from "firebase/database";
 import Cathedral from "./Cathedral"; // Cathedral structure
 import Lighting from "./Lighting"; // Lighting component
-import Joystick from "react-joystick-component"; // Joystick library
+import { Joystick } from "react-joystick-component";
+ // Joystick library
 import { io } from "socket.io-client";
 
 const VirtualWorld = () => {
