@@ -13,6 +13,7 @@ import ProfileList from "./pages/ProfileList"; // List of all profiles
 import UserProfile from "./pages/UserProfile"; // Specific user profile
 import ManageBlogs from "./pages/ManageBlogs"; // Manage blogs page
 import Meta from "./pages/Meta";
+import VirtualWorld from "./pages/VirtualWorld"; // Virtual World Component
 import Formation from "./pages/Seminary/Formation";
 import Requirements from "./pages/Seminary/Requirements";
 import Foundations from "./pages/Seminary/Foundations";
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="contact" element={<Contact />} />
           <Route path="meta" element={<Meta />} />
           <Route path="blogs" element={<Blogs />} />
+          <Route path="virtualworld" element={<VirtualWorld />} /> {/* Virtual World */}
 
           {/* Profile-related routes */}
           <Route path="profilelist" element={<ProfileList />} /> {/* List of all profiles */}
