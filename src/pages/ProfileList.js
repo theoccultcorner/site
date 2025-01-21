@@ -5,6 +5,7 @@ import {
   doc,
   onSnapshot,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 import {
@@ -17,6 +18,7 @@ import {
   Paper,
   Button,
   Collapse,
+  TextField,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -28,6 +30,8 @@ function ProfileList() {
   const [onlineUsers, setOnlineUsers] = useState({});
   const [expandedProfile, setExpandedProfile] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [editMode, setEditMode] = useState(null);
+  const [editProfileData, setEditProfileData] = useState({});
   const navigate = useNavigate();
 
   // Sanitize display name
@@ -116,14 +120,31 @@ function ProfileList() {
 
   const handleExpand = (profileId) => {
     setExpandedProfile(expandedProfile === profileId ? null : profileId);
+    setEditMode(null); // Exit edit mode when expanding/collapsing
   };
 
-  const handleManageBlogs = (profile) => {
-    if (profile.id === currentUserId) {
-      const sanitizedName = sanitizeDisplayName(profile.displayName);
-      navigate(`/blogs/${sanitizedName}`, { state: { userId: profile.id } });
-    } else {
-      alert("You can only manage your own blogs!");
+  const handleEdit = (profile) => {
+    setEditMode(profile.id);
+    setEditProfileData({
+      displayName: profile.displayName || "",
+      bio: profile.bio || "",
+      email: profile.email || "",
+      website: profile.website || "",
+    });
+  };
+
+  const handleSave = async (profileId) => {
+    try {
+      const profileRef = doc(db, "profiles", profileId);
+      await updateDoc(profileRef, editProfileData);
+      setProfiles((prevProfiles) =>
+        prevProfiles.map((profile) =>
+          profile.id === profileId ? { ...profile, ...editProfileData } : profile
+        )
+      );
+      setEditMode(null);
+    } catch (error) {
+      console.error("Error updating profile:", error);
     }
   };
 
@@ -146,6 +167,7 @@ function ProfileList() {
       <List>
         {profiles.map((profile) => {
           const isOnline = onlineUsers[profile.id]?.online || false;
+          const isEditable = currentUserId === profile.id;
 
           return (
             <div key={profile.id}>
@@ -156,7 +178,9 @@ function ProfileList() {
               >
                 <ListItemAvatar>
                   <Avatar src={profile.photoURL} alt={profile.displayName}>
-                    {profile.photoURL ? "" : profile.displayName.charAt(0).toUpperCase()}
+                    {profile.photoURL
+                      ? ""
+                      : profile.displayName.charAt(0).toUpperCase()}
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
@@ -187,42 +211,100 @@ function ProfileList() {
                 unmountOnExit
               >
                 <div style={{ paddingLeft: "20px", paddingBottom: "10px" }}>
-                  <Typography variant="body2">
-                    <strong>Bio:</strong> {profile.bio || "No bio available"}
-                  </Typography>
-                  {profile.email && (
-                    <Typography variant="body2">
-                      <strong>Email:</strong>{" "}
-                      <a
-                        href={`mailto:${profile.email}`}
-                        style={{ color: "#1976d2" }}
+                  {editMode === profile.id ? (
+                    <>
+                      <TextField
+                        label="Display Name"
+                        fullWidth
+                        margin="normal"
+                        value={editProfileData.displayName}
+                        onChange={(e) =>
+                          setEditProfileData((prev) => ({
+                            ...prev,
+                            displayName: e.target.value,
+                          }))
+                        }
+                      />
+                      <TextField
+                        label="Bio"
+                        fullWidth
+                        margin="normal"
+                        multiline
+                        value={editProfileData.bio}
+                        onChange={(e) =>
+                          setEditProfileData((prev) => ({
+                            ...prev,
+                            bio: e.target.value,
+                          }))
+                        }
+                      />
+                      <TextField
+                        label="Email"
+                        fullWidth
+                        margin="normal"
+                        value={editProfileData.email}
+                        onChange={(e) =>
+                          setEditProfileData((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
+                      />
+                      <TextField
+                        label="Website"
+                        fullWidth
+                        margin="normal"
+                        value={editProfileData.website}
+                        onChange={(e) =>
+                          setEditProfileData((prev) => ({
+                            ...prev,
+                            website: e.target.value,
+                          }))
+                        }
+                      />
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleSave(profile.id)}
+                        style={{ marginTop: "10px" }}
                       >
-                        {profile.email}
-                      </a>
-                    </Typography>
-                  )}
-                  {profile.website && (
-                    <Typography variant="body2">
-                      <strong>Website:</strong>{" "}
-                      <a
-                        href={profile.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: "#1976d2" }}
+                        Save
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => setEditMode(null)}
+                        style={{ marginTop: "10px", marginLeft: "10px" }}
                       >
-                        {profile.website}
-                      </a>
-                    </Typography>
-                  )}
-                  {currentUserId === profile.id && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleManageBlogs(profile)}
-                      style={{ marginTop: "10px" }}
-                    >
-                      Manage Blogs
-                    </Button>
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Typography variant="body2">
+                        <strong>Bio:</strong> {profile.bio || "No bio available"}
+                      </Typography>
+                      {profile.email && (
+                        <Typography variant="body2">
+                          <strong>Email:</strong> {profile.email}
+                        </Typography>
+                      )}
+                      {profile.website && (
+                        <Typography variant="body2">
+                          <strong>Website:</strong> {profile.website}
+                        </Typography>
+                      )}
+                      {isEditable && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleEdit(profile)}
+                          style={{ marginTop: "10px" }}
+                        >
+                          Edit Profile
+                        </Button>
+                      )}
+                    </>
                   )}
                 </div>
               </Collapse>
