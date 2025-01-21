@@ -155,9 +155,7 @@ const Layout = () => {
                   Διαλεκτικὸς Χῶρος
                 </MenuItem>
                 <MenuItem onClick={() => navigateTo("/blogs")}>Blogs</MenuItem>
-                <MenuItem onClick={() => navigateTo("/virtualworld")}>
-                  Virtual World
-                </MenuItem>
+              
                 <MenuItem onClick={() => navigateTo("/contact")}>
                   Contact
                 </MenuItem>
