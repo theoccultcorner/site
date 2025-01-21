@@ -148,6 +148,15 @@ function ProfileList() {
     }
   };
 
+  const handleManageBlogs = (profile) => {
+    if (profile.id === currentUserId) {
+      const sanitizedName = sanitizeDisplayName(profile.displayName);
+      navigate(`/blogs/${sanitizedName}`, { state: { userId: profile.id } });
+    } else {
+      alert("You can only manage your own blogs!");
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ textAlign: "center", marginTop: "20px" }}>
@@ -295,14 +304,24 @@ function ProfileList() {
                         </Typography>
                       )}
                       {isEditable && (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleEdit(profile)}
-                          style={{ marginTop: "10px" }}
-                        >
-                          Edit Profile
-                        </Button>
+                        <>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleEdit(profile)}
+                            style={{ marginTop: "10px" }}
+                          >
+                            Edit Profile
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleManageBlogs(profile)}
+                            style={{ marginTop: "10px", marginLeft: "10px" }}
+                          >
+                            Manage Blogs
+                          </Button>
+                        </>
                       )}
                     </>
                   )}
