@@ -24,10 +24,12 @@ import Ministry from "./pages/Seminary/Ministry";
 import Recommended from "./pages/Seminary/Recommended";
  
 
-import DegreePrograms from "./pages/Seminary/DegreePrograms";
-import CertificatePrograms from "./pages/Seminary/CertificatePrograms";
+import DegreePrograms from "./pages/Seminary/DegreePrograms.js";
+import CertificatePrograms from "./pages/Seminary/CertificatePrograms.js";
+import Events from "./pages/Seminary/Events.js";
+
 import Accreditation from "./pages/Seminary/Accreditation";
-import Events from "./pages/Seminary/Events";
+ 
 
 const App = () => {
   return (
