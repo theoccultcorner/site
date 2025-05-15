@@ -53,7 +53,7 @@ const Foundations = () => {
       <h3 style={styles.heading}>Additional Information</h3>
       <ul style={styles.list}>
         <li><strong>Prerequisite:</strong> Access to a computer and MS Word with internet capabilities</li>
-        <li><strong>Tuition:</strong> $300.00 (US)</li>
+      
       </ul>
 
       <h3 style={styles.heading}>Contact Information</h3>
