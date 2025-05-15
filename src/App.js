@@ -17,12 +17,11 @@ import Meta from "./pages/Meta";
 import Formation from "./pages/Seminary/Formation";
 import Requirements from "./pages/Seminary/Requirements";
 import Foundations from "./pages/Seminary/Foundations";
-import CertificatePrograms from "./pages/Seminary/CertificatePrograms";
-import DegreePrograms from "./pages/Seminary/DegreePrograms";
+ 
 import Ministry from "./pages/Seminary/Ministry";
 import Recommended from "./pages/Seminary/Recommended";
 import Accreditation from "./pages/Seminary/Accreditation";
-import Events from "./pages/Seminary/Events";
+ 
 
 const App = () => {
   return (
@@ -47,10 +46,9 @@ const App = () => {
           <Route path="seminary/foundations" element={<Foundations />} />
           <Route path="seminary/ministry" element={<Ministry />} />
           <Route path="seminary/recommended" element={<Recommended />} />
-          <Route path="seminary/degree-programs" element={<DegreePrograms />} />
-          <Route path="seminary/certificate-programs" element={<CertificatePrograms />} />
+   
           <Route path="seminary/accreditation" element={<Accreditation />} />
-          <Route path="seminary/events" element={<Events />} />
+          
 
           <Route path="*" element={<NoPage />} />
         </Route>
