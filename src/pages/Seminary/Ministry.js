@@ -15,7 +15,7 @@ const MinistryDegrees = () => {
       </ul>
 
       <p style={styles.text}>
-        The Gnostic Catholic Union Seminary offers a comprehensive Ministry Track program designed to deepen faith,
+        The Gnostic Union Seminary offers a comprehensive Ministry Track program designed to deepen faith,
         develop leadership skills, and prepare individuals for community pastoral leadership roles within the Gnostic
         Catholic tradition. The program recognizes prior life experience, allowing significant credit for an applicant's
         proven record of service accomplishment in recognized ministry positions.
@@ -52,8 +52,8 @@ const MinistryDegrees = () => {
         For more information, please contact:
       </p>
       <div style={styles.contact}>
-        <p>Bishop Jason Jones, G.S.J., S.T.L., M.S., DMin., Ed.D.</p>
-        <p>Rector and Academic Dean of The Gnostic Catholic Union Seminary</p>
+        <p>Bishop Nathan Wilson</p>
+        <p>Rector and Academic Dean of The Gnostic Union</p>
         <Button
           variant="contained"
           color="primary"

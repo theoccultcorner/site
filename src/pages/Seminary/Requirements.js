@@ -43,7 +43,7 @@ const Requirements = () => {
         <strong>In the Light of the Logos,</strong>
       </p>
       <p>
-        Bishop Jason Jones, G.S.J., S.T.L., M.S., DMin., Ed.D.<br />
+        Bishop Nathan Wilson<br />
         Rector and Academic Dean of The Gnostic Catholic Union Seminary
       </p>
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
