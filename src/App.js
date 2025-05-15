@@ -8,7 +8,10 @@ import About from "./pages/About";
 import Seminary from "./pages/Seminary/Seminary";
 import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
-
+import DegreePrograms from "./pages/Seminary/DegreePrograms";
+import CertificatePrograms from "./pages/Seminary/CertificatePrograms";
+import Events from "./pages/Seminary/Events";
+import Accreditation from "./pages/Seminary/Accreditation";
 import ProfileList from "./pages/ProfileList"; // List of all profiles
 import UserProfile from "./pages/UserProfile"; // Specific user profile
 import ManageBlogs from "./pages/ManageBlogs"; // Manage blogs page
@@ -24,11 +27,7 @@ import Ministry from "./pages/Seminary/Ministry";
 import Recommended from "./pages/Seminary/Recommended";
  
 
-import DegreePrograms from "./pages/Seminary/DegreePrograms.js";
-import CertificatePrograms from "./pages/Seminary/CertificatePrograms.js";
-import Events from "./pages/Seminary/Events.js";
-
-import Accreditation from "./pages/Seminary/Accreditation";
+ 
  
 
 const App = () => {
