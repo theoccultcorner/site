@@ -156,10 +156,9 @@ const Layout = () => {
                   <MenuItem onClick={() => navigateTo("/seminary/recommended")}>Recommended Reading</MenuItem>
                   <MenuItem onClick={() => navigateTo("/seminary/ministry")}>Ministry</MenuItem>
                   <MenuItem onClick={() => navigateTo("/seminary/foundations")}>Foundations</MenuItem>
-                  <MenuItem onClick={() => navigateTo("/seminary/degree-programs")}>Degree Programs</MenuItem>
-                  <MenuItem onClick={() => navigateTo("/seminary/certificate-programs")}>Certificate Programs</MenuItem>
+ 
                   <MenuItem onClick={() => navigateTo("/seminary/accreditation")}>Accreditation</MenuItem>
-                  <MenuItem onClick={() => navigateTo("/seminary/events")}>Events</MenuItem>
+                 
                 </Menu>
                 <MenuItem onClick={() => navigateTo("/contact")}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
