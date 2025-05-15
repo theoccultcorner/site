@@ -13,17 +13,21 @@ import ProfileList from "./pages/ProfileList"; // List of all profiles
 import UserProfile from "./pages/UserProfile"; // Specific user profile
 import ManageBlogs from "./pages/ManageBlogs"; // Manage blogs page
 import Meta from "./pages/Meta";
-import VirtualWorld from "./pages/VirtualWorld"; // Virtual World Component
+ 
 import Formation from "./pages/Seminary/Formation";
 import Requirements from "./pages/Seminary/Requirements";
 import Foundations from "./pages/Seminary/Foundations";
 
 // Newly added components
-import CertificatePrograms from "./pages/Seminary/CertificatePrograms";
-import DegreePrograms from "./pages/Seminary/DegreePrograms";
+ 
 import Ministry from "./pages/Seminary/Ministry";
 import Recommended from "./pages/Seminary/Recommended";
+ 
+
+import DegreePrograms from "./pages/Seminary/DegreePrograms";
+import CertificatePrograms from "./pages/Seminary/CertificatePrograms";
 import Accreditation from "./pages/Seminary/Accreditation";
+import Events from "./pages/Seminary/Events";
 
 const App = () => {
   return (
@@ -37,7 +41,7 @@ const App = () => {
           <Route path="contact" element={<Contact />} />
           <Route path="meta" element={<Meta />} />
           <Route path="blogs" element={<Blogs />} />
-          <Route path="virtualworld" element={<VirtualWorld />} /> {/* Virtual World */}
+           
 
           {/* Profile-related routes */}
           <Route path="profilelist" element={<ProfileList />} /> {/* List of all profiles */}
@@ -51,11 +55,10 @@ const App = () => {
           <Route path="seminary/foundations" element={<Foundations />} />
 
           {/* New seminary program routes */}
-          <Route path="seminary/certificateprograms" element={<CertificatePrograms />} />
-          <Route path="seminary/degreeprograms" element={<DegreePrograms />} />
-          <Route path="seminary/ministry" element={<Ministry />} />
-          <Route path="seminary/recommended" element={<Recommended />} />
-          <Route path="seminary/accreditation" element={<Accreditation />} />
+ <Route path="seminary/degree-programs" element={<DegreePrograms />} />
+<Route path="seminary/certificate-programs" element={<CertificatePrograms />} />
+<Route path="seminary/accreditation" element={<Accreditation />} />
+<Route path="seminary/events" element={<Events />} />
 
           {/* Catch-all route */}
           <Route path="*" element={<NoPage />} />

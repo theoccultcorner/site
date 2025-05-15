@@ -27,6 +27,7 @@ import { db } from "../firebaseConfig";
 const Layout = () => {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [seminaryAnchorEl, setSeminaryAnchorEl] = useState(null);
   const navigate = useNavigate();
 
   // Check for mobile screen size
@@ -80,11 +81,16 @@ const Layout = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+    setSeminaryAnchorEl(null);
   };
 
   const navigateTo = (path) => {
     handleClose();
     navigate(path);
+  };
+
+  const handleSeminaryMenu = (event) => {
+    setSeminaryAnchorEl(event.currentTarget);
   };
 
   return (
@@ -135,30 +141,35 @@ const Layout = () => {
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
                 keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
                 <MenuItem onClick={() => navigateTo("/about")}>About</MenuItem>
-                <MenuItem onClick={() => navigateTo("/profileList")}>
-                  Community
-                </MenuItem>
-                <MenuItem onClick={() => navigateTo("/meta")}>
-                  Διαλεκτικὸς Χῶρος
-                </MenuItem>
+                <MenuItem onClick={() => navigateTo("/profileList")}>Community</MenuItem>
+                <MenuItem onClick={() => navigateTo("/meta")}>Διαλεκτικὸς Χῶρος</MenuItem>
                 <MenuItem onClick={() => navigateTo("/blogs")}>Blogs</MenuItem>
-              
-                <MenuItem onClick={() => navigateTo("/contact")}>
-                  Contact
-                </MenuItem>
+                <MenuItem onClick={handleSeminaryMenu}>Seminary ▸</MenuItem>
+                <Menu
+                  anchorEl={seminaryAnchorEl}
+                  open={Boolean(seminaryAnchorEl)}
+                  onClose={handleClose}
+                  anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                  transformOrigin={{ vertical: "top", horizontal: "left" }}
+                >
+                  <MenuItem onClick={() => navigateTo("/seminary")}>Overview</MenuItem>
+                  <MenuItem onClick={() => navigateTo("/seminary/requirements")}>Requirements</MenuItem>
+                  <MenuItem onClick={() => navigateTo("/seminary/recommended")}>Recommended Reading</MenuItem>
+                  <MenuItem onClick={() => navigateTo("/seminary/ministry")}>Ministry</MenuItem>
+                  <MenuItem onClick={() => navigateTo("/seminary/foundations")}>Foundations</MenuItem>
+<MenuItem onClick={() => navigateTo("/seminary/degree-programs")}>Degree Programs</MenuItem>
+<MenuItem onClick={() => navigateTo("/seminary/certificate-programs")}>Certificate Programs</MenuItem>
+<MenuItem onClick={() => navigateTo("/seminary/accreditation")}>Accreditation</MenuItem>
+<MenuItem onClick={() => navigateTo("/seminary/events")}>Events</MenuItem>
+                </Menu>
+                <MenuItem onClick={() => navigateTo("/contact")}>Contact</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </Box>
