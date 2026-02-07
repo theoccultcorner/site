@@ -18,7 +18,7 @@ const Home = () => {
           The Gnostic Union aligns itself with the history and teachings of the first Christians of early 1st century Christianity and the teachings of Jesus Christ as found in the Gospel of Thomas. We encourage our new members to read from the Nag Hammadi and to understand how different early Christianity is from modern mainstream Christianity. We welcome all people, regardless of past religious backgrounds or faiths.
         </p>
         <p style={styles.description}>
-          Gnosis means knowledge—not just simple intellectual knowledge, but deep spiritual knowledge within you. Knowledge from the Spirit, from the Holy Spirit, and from and of God.
+          Gnosis means knowledge—not just simple intellectual knowledge, but deep spiritual knowledge within you. Knowledge from the Holy Spirit, and of God.
         </p>
       </section>
 
