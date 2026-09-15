@@ -3,7 +3,7 @@ import { Button } from '@mui/material';
 
 const MinistryDegrees = () => {
   return (
-    <div style={styles.container}>
+    <div className="prose-page">
       <h1 style={styles.title}>Ministry Degrees</h1>
 
       <h3 style={styles.heading}>Programs Offered</h3>

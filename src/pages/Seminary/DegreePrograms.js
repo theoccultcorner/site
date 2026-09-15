@@ -3,7 +3,7 @@ import { Button } from '@mui/material';
 
 const DegreePrograms = () => {
   return (
-    <div style={styles.container}>
+    <div className="prose-page">
       <h1 style={styles.title}>Degree Programs</h1>
       <p style={styles.text}>
         Theology is the systematic study of the nature of the divine and, more broadly, of religious belief. It examines

@@ -1,65 +1,63 @@
-import React from 'react';
-import { Button } from '@mui/material';
+import React from "react";
+import { ArrowForwardRounded, AutoStoriesRounded, SchoolRounded, VolunteerActivismRounded } from "@mui/icons-material";
+import { Box, Button, Card, CardContent, Container, Grid, Stack, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
-const Seminary = () => {
-  return (
-    <div className="seminary-container">
-      <header className="seminary-header">
-        <h1>Training Leaders for the 21st Century</h1>
-      </header>
+const paths = [
+  { icon: <AutoStoriesRounded />, title: "Foundations", text: "Study foundational Gnostic Christian texts, theology, history, and spiritual practice.", link: "/seminary/foundations" },
+  { icon: <VolunteerActivismRounded />, title: "Ministry", text: "Develop the pastoral, leadership, communication, and service skills needed for ministry.", link: "/seminary/ministry" },
+  { icon: <SchoolRounded />, title: "Formation", text: "Integrate scholarship, inner development, mentorship, and practical experience.", link: "/seminary/formation" },
+];
 
-      <section className="seminary-intro">
-        <h2>Are you called to serve?</h2>
-        <p>
-          The Gnostic Union Seminary is preparing students to answer that call. Today, independent Gnostic Christians of
-          all ages are being called to the way of peace, the way of Gnosis. Many people from all backgrounds and ages have
-          transformed their lives thanks to Gnostic Christianity and the teachings of Jesus the Christ.
-        </p>
-      </section>
+const Seminary = () => (
+  <>
+    <Box component="header" sx={{ py: { xs: 9, md: 14 }, textAlign: "center", borderBottom: "1px solid", borderColor: "divider", background: "radial-gradient(circle at 50% 30%, rgba(121,201,190,.13), transparent 28rem)" }}>
+      <Container maxWidth="md">
+        <Typography className="eyebrow" component="p" sx={{ justifyContent: "center" }}>The Gnostic Union Seminary</Typography>
+        <Typography variant="h1" sx={{ mt: 2, fontSize: { xs: "3.5rem", md: "6rem" } }}>Form the mind.<br /><Box component="span" sx={{ color: "primary.main" }}>Awaken the spirit.</Box></Typography>
+        <Typography color="text.secondary" sx={{ mt: 3, mx: "auto", maxWidth: 680, fontSize: "1.08rem", lineHeight: 1.8 }}>
+          Accessible theological education and personal formation for those called to study, serve, teach, and lead in the Gnostic Christian tradition.
+        </Typography>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} justifyContent="center" sx={{ mt: 4 }}>
+          <Button component={Link} to="/seminary/requirements" variant="contained" endIcon={<ArrowForwardRounded />}>View requirements</Button>
+          <Button component={Link} to="/seminary/recommended" variant="outlined">Recommended reading</Button>
+        </Stack>
+      </Container>
+    </Box>
 
-      <section className="seminary-programs">
-        <p>
-          We at The Gnostic Union offer several certificate programs that include bachelor, master, and doctoral-level
-          degrees free of charge. Education to help you build your ministry should be affordable and easily accessible.
-        </p>
-      </section>
+    <Container maxWidth="lg" sx={{ py: { xs: 8, md: 11 } }}>
+      <Grid container spacing={3}>
+        {paths.map((path) => (
+          <Grid item xs={12} md={4} key={path.title}>
+            <Card className="glass-panel" sx={{ height: "100%" }}>
+              <CardContent sx={{ p: 4, "&:last-child": { pb: 4 } }}>
+                <Box sx={{ color: "primary.main", mb: 2 }}>{path.icon}</Box>
+                <Typography variant="h4">{path.title}</Typography>
+                <Typography color="text.secondary" sx={{ mt: 1.5, lineHeight: 1.75 }}>{path.text}</Typography>
+                <Button component={Link} to={path.link} endIcon={<ArrowForwardRounded />} sx={{ mt: 2.5 }}>Explore</Button>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
-      <section className="seminary-dissertation">
-        <h3>Degree by Dissertation / Thesis Program</h3>
-        <p>
-          We are pleased to announce our Degree by Dissertation/Thesis Program. Although this model of learning can be
-          completed in a shorter amount of time compared to the traditional coursework method, it is by no means less
-          rigorous. These programs can be challenging but equally rewarding, as the result is a work of publishable quality
-          and depth.
-        </p>
-      </section>
-
-      <section className="seminary-contact">
-        <h3>Contact Us</h3>
-        <p>
-          Find us on Facebook at <strong>The Gnostic Union</strong>, or connect with us here on our website. You can also
-          find us on YouTube. Additionally, there is another associated branch of The Gnostic Union on Facebook, run by
-          Bishop Jody, called <strong>The Gnostic Union Seminary</strong>. This branch offers its own unique courses and
-          degrees.
-        </p>
-        <p>
-          Degrees will be recognized by both parties and by other associations within and allied with The Gnostic Union.
-          However, they are not to be confused with accredited academic degrees from other religious or secular educational
-          institutions.
-        </p>
-      </section>
-
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <Button
-          variant="contained"
-          color="primary"
-          href="mailto:BishopJasonJones@TheGnosticCatholicUnion.org"
-        >
-          Contact Us
-        </Button>
-      </div>
-    </div>
-  );
-};
+      <Grid container spacing={{ xs: 5, md: 9 }} sx={{ mt: { xs: 7, md: 11 } }}>
+        <Grid item xs={12} md={5}>
+          <Typography className="eyebrow" component="p">Answering the call</Typography>
+          <Typography variant="h2" sx={{ mt: 2, fontSize: { xs: "2.8rem", md: "4.2rem" } }}>Training leaders for the 21st century</Typography>
+        </Grid>
+        <Grid item xs={12} md={7}>
+          <Typography color="text.secondary" sx={{ fontSize: "1.07rem", lineHeight: 1.9 }}>
+            Independent Gnostic Christians of all ages are being called to the way of peace and the way of Gnosis. Our programs help students deepen their understanding, strengthen their ministry, and translate spiritual insight into compassionate service.
+          </Typography>
+          <Typography color="text.secondary" sx={{ mt: 2.5, fontSize: "1.07rem", lineHeight: 1.9 }}>
+            Certificate and ecclesiastical degree paths include bachelor’s, master’s, and doctoral-level work. Degree-by-thesis and dissertation options are rigorous and guided, producing work of meaningful depth and potential publishable quality.
+          </Typography>
+          <Button href="mailto:BishopJasonJones@TheGnosticCatholicUnion.org" variant="contained" color="secondary" sx={{ mt: 4 }}>Ask about enrollment</Button>
+        </Grid>
+      </Grid>
+    </Container>
+  </>
+);
 
 export default Seminary;

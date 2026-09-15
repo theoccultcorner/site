@@ -3,7 +3,7 @@ import { Button } from '@mui/material';
 
 const CertificatePrograms = () => {
   return (
-    <div style={styles.container}>
+    <div className="prose-page">
       <h1 style={styles.title}>Certificate Programs</h1>
 
       <h2 style={styles.heading}>Foundations in Gnostic Catholic Theology</h2>

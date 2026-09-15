@@ -3,7 +3,7 @@ import { Button } from '@mui/material';
 
 const Foundations = () => {
   return (
-    <div style={styles.container}>
+    <div className="prose-page">
       <h1 style={styles.title}>Foundations in Gnostic Christian Theology</h1>
       <p style={styles.text}>
         The courses provided by The Gnostic Union offer a comprehensive introduction to Gnostic Christian theology, core beliefs, practices, and history. Students will delve into the roots of ancient Christianity and explore its evolution into modern Gnostic Christian thought. The course aims to establish a solid theological framework for further studies and independent work students may decide to undertake with support from our team.

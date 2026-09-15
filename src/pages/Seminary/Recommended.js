@@ -18,7 +18,7 @@ const RecommendedReading = () => {
   ];
 
   return (
-    <Box style={styles.container}>
+    <Box className="prose-page">
       <Typography variant="h4" style={styles.title}>
         Recommended Reading
       </Typography>
